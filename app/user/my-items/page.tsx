@@ -1,7 +1,7 @@
 export default function Page() {
   return (
     <div>
-      This is the checkout page
+      This is the "my items" page
     </div>
   );
 }
