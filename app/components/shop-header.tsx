@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { ShoppingCartIcon, BuildingStorefrontIcon, WrenchScrewdriverIcon, UserIcon, ArchiveBoxIcon, ArrowRightEndOnRectangleIcon } from '@heroicons/react/24/solid';
 import Link from 'next/link'
@@ -9,28 +9,28 @@ export default function ShopHeader() {
   const username = 'John Smith'; // TODO: Put the actual username here. None = not logged in
 
   return (
-    <header className='sticky top-0 z-50 shadow'>
-      <nav className="border-b shadow">
+    <header className='sticky top-0 z-50 shadow bg-white dark:bg-black'>
+      <nav className='border-b shadow'>
         <div className='flex items-center justify-between'>
           <div className='flex'>
-            <Link href="/shop/catalog" className="flex font-semibold py-1 px-6 transition">
+            <Link href='/shop/catalog' className='flex font-semibold py-1 px-6 transition'>
               <BuildingStorefrontIcon className='size-6' />
               Catalog
             </Link>
-            <div className="w-px border" />
-            <Link href="/shop/build-a-duck" className="flex font-semibold py-1 px-6 transition">
+            <div className='w-px border' />
+            <Link href='/shop/build-a-duck' className='flex font-semibold py-1 px-6 transition'>
               <WrenchScrewdriverIcon className='size-6' />
               Build-a-Duck
             </Link>
-            <div className="w-px border" />
+            <div className='w-px border' />
           </div>
           <div className='flex justify-end'>
-            <div className="w-px border" />
-            <Link href="/shop/cart" className="flex font-semibold py-1 px-6 transition">
+            <div className='w-px border' />
+            <Link href='/shop/cart' className='flex font-semibold py-1 px-6 transition'>
               <ShoppingCartIcon className='size-6' />
               Cart
             </Link>
-            <div className="w-px border" />
+            <div className='w-px border' />
             {!username && <Link href='/user/login' className='flex texflex font-semibold py-1 px-6 transition'>
               <UserIcon className='size-6' />
               Login
@@ -52,7 +52,7 @@ export default function ShopHeader() {
                 </MenuItem>
               </MenuItems>
             </Menu>}
-            <div className="w-px border" />
+            <div className='w-px border' />
             <ThemeToggle />
           </div>
         </div>
