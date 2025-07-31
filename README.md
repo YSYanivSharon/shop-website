@@ -29,3 +29,10 @@ To learn more about Next.js, take a look at the following resources:
 ## Heroicons
 
 - We can use icons from [Heroicons](https://heroicons.com/). You can see an example in the /app/components/shop-header.tsx file.
+
+## Accounts
+
+The website already has 2 accounts that were pre-made:
+
+- <admin@ducks.com> - admin
+- <joe@gmail.com> - 1234

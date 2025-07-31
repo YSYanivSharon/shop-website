@@ -5,16 +5,11 @@ import { useState, useEffect } from 'react';
 
 export const ThemeToggle = () => {
   const [mounted, setMounted] = useState(false);
-
   const { setTheme, resolvedTheme } = useTheme();
 
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  if (!mounted) {
-    return null;
-  };
 
   function onChange(set: boolean) {
     setTheme(set ? 'dark' : 'light');
@@ -22,7 +17,7 @@ export const ThemeToggle = () => {
 
   return (
     <Switch
-      checked={resolvedTheme == 'dark'}
+      checked={!mounted || resolvedTheme == 'dark'}
       onChange={onChange}
       className="group relative flex h-7 w-14 cursor-pointer rounded-full p-1 ease-in-out focus:not-data-focus:outline-none data-focus:outline data-focus:outline-white bg-gray-300 data-checked:bg-gray-700"
     >
@@ -30,8 +25,8 @@ export const ThemeToggle = () => {
         aria-hidden="true"
         className="pointer-events-none inline-block size-0 translate-x-0 rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out group-data-checked:translate-x-7"
       >
-        {resolvedTheme == 'dark' && <MoonIcon className='size-5' />}
-        {resolvedTheme == 'light' && <SunIcon className='size-5' />}
+        {mounted && resolvedTheme == 'dark' && <MoonIcon className='size-5' />}
+        {!mounted || resolvedTheme == 'light' && <SunIcon className='size-5' />}
       </span>
     </Switch>
   )

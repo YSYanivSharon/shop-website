@@ -4,7 +4,7 @@ export type ShopItem = {
   price: number;
 };
 
-const shop_items: ShopItem[] = [
+export const shop_items: ShopItem[] = [
   {
     id: 1,
     name: "Regular",
