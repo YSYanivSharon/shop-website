@@ -1,11 +1,17 @@
-'use client';
+"use client";
 
-import { User } from '@/lib/persist-module';
-import { createContext, useState, PropsWithChildren, Dispatch, SetStateAction } from 'react';
-import * as Server from '@/lib/auth';
+import { User } from "@/lib/persist-module";
+import {
+  createContext,
+  useState,
+  PropsWithChildren,
+  Dispatch,
+  SetStateAction,
+} from "react";
+import * as Server from "@/lib/auth";
 
-export const StorageKey = 'user';
-const isServer = typeof window === 'undefined';
+export const StorageKey = "user";
+const isServer = typeof window === "undefined";
 export const UserContext = createContext<User | null>(null);
 let setState: Dispatch<SetStateAction<User | null>>;
 
@@ -21,17 +27,17 @@ export function UserProvider({ children }: PropsWithChildren<unknown>) {
  * Loads the current user from the persistent storage if there is one
  */
 function loadCurrUser() {
-  if (isServer) return null
+  if (isServer) return null;
 
   try {
     const userJson = localStorage.getItem(StorageKey);
 
     if (!userJson) return null;
 
-    return JSON.parse(userJson) as User || null;
+    return (JSON.parse(userJson) as User) || null;
   } catch (e) {
     // Unsupported
-    return null
+    return null;
   }
 }
 
@@ -44,7 +50,7 @@ export function setCurrUser(user: User | null) {
 export async function signup(email: string, password: string) {
   const result = await Server.signup(email, password);
 
-  if (typeof result === 'string') return result;
+  if (typeof result === "string") return result;
 
   setCurrUser(result);
 

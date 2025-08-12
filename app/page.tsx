@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import {ShopItem} from "@/app/lib/shop-item-data";
+import { ShopItem } from "@/app/lib/shop-item-data";
 
 const featuredDucks: ShopItem[] = [
   { id: 1, name: "Classic Quacker", price: 20 },
@@ -44,8 +44,12 @@ export default function HomePage() {
                 height={200}
                 className="mx-auto rounded-full"
               />
-              <h3 className="mt-4 text-lg font-bold text-yellow-800 dark:text-yellow-300">{duck.name}</h3>
-              <p className="text-gray-700 dark:text-gray-300 font-semibold">₪{duck.price}</p>
+              <h3 className="mt-4 text-lg font-bold text-yellow-800 dark:text-yellow-300">
+                {duck.name}
+              </h3>
+              <p className="text-gray-700 dark:text-gray-300 font-semibold">
+                ₪{duck.price}
+              </p>
             </div>
           ))}
         </div>
