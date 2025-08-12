@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 const ducks = [
-  { id: 1, name: "Classic Quacker", price: 20},
+  { id: 1, name: "Classic Quacker", price: 20 },
   { id: 2, name: "Doctor Duck", price: 30 },
   { id: 3, name: "Pirate Splash", price: 35 },
   { id: 4, name: "Business Beak", price: 28 },
@@ -18,7 +18,9 @@ const ducks = [
 export default function Page() {
   return (
     <main className="p-6">
-      <h1 className="text-3xl md:text-4xl font-bold text-center mb-8 text-slate-900 dark:text-white">Choose your Duck</h1>
+      <h1 className="text-3xl md:text-4xl font-bold text-center mb-8 text-slate-900 dark:text-white">
+        Choose your Duck
+      </h1>
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {ducks.map((duck) => (
           <div
@@ -32,7 +34,9 @@ export default function Page() {
               height={200}
               className="mx-auto mb-3 rounded"
             />
-            <h2 className="font-semibold text-lg text-slate-900 dark:text-slate-100">{duck.name}</h2>
+            <h2 className="font-semibold text-lg text-slate-900 dark:text-slate-100">
+              {duck.name}
+            </h2>
             <p className="text-slate-600 dark:text-slate-300">₪{duck.price}</p>
           </div>
         ))}

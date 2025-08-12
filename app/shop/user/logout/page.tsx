@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { logout } from '@/app/components/user-provider';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { logout } from "@/app/components/user-provider";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Page() {
   const router = useRouter();
   useEffect(() => {
     logout();
-    router.replace('/');
+    router.replace("/");
   }, [router]);
 
   return null;

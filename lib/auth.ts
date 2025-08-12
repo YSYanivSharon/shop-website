@@ -1,25 +1,25 @@
-'use server'
+"use server";
 
-import crypto from 'node:crypto';
-import { cookies } from 'next/headers';
-import { getUser, addUser } from '@/lib/persist-module';
-import type { User } from '@/lib/persist-module';
-import { AuthLevel } from '@/lib/persist-module';
+import crypto from "node:crypto";
+import { cookies } from "next/headers";
+import { getUser, addUser } from "@/lib/persist-module";
+import type { User } from "@/lib/persist-module";
+import { AuthLevel } from "@/lib/persist-module";
 
-const userCookieName = 'user';
-const certCookieName = 'cert';
+const userCookieName = "user";
+const certCookieName = "cert";
 
 export async function getSecret() {
-  return 'A completely random secret that is stored correctly';
+  return "A completely random secret that is stored correctly";
 }
 
 export async function getScrypt(text: string) {
-  return crypto.scryptSync(text, await getSecret(), 64).toString('hex');
+  return crypto.scryptSync(text, await getSecret(), 64).toString("hex");
 }
 
 export async function getHmac(text: string) {
-  const hmac = crypto.createHmac('sha256', await getSecret());
-  return hmac.update(text).digest().toString('hex')
+  const hmac = crypto.createHmac("sha256", await getSecret());
+  return hmac.update(text).digest().toString("hex");
 }
 
 export async function getAuthLevel(): Promise<AuthLevel> {
@@ -40,16 +40,16 @@ export async function signup(email: string, password: string) {
   const passwordRegex = /.+/;
 
   if (!emailRegex.test(email)) {
-    return 'Invalid email';
+    return "Invalid email";
   }
 
   if (!passwordRegex.test(password)) {
-    return 'Invalid password';
+    return "Invalid password";
   }
 
   // Check if email is already used
   if (await getUser(email)) {
-    return 'Email already used';
+    return "Email already used";
   }
 
   let hashedPassword = await getScrypt(password);
@@ -57,7 +57,7 @@ export async function signup(email: string, password: string) {
   let user = await addUser(email, hashedPassword, AuthLevel.Normal);
 
   if (!user) {
-    return 'An error occurred while creating your account';
+    return "An error occurred while creating your account";
   }
 
   await storeVerifiedSession(user);
@@ -68,7 +68,7 @@ export async function signup(email: string, password: string) {
 export async function login(email: string, password: string) {
   const user = await getUser(email);
 
-  if (user && user.password == await getScrypt(password)) {
+  if (user && user.password == (await getScrypt(password))) {
     await storeVerifiedSession(user);
     return user;
   }
@@ -90,15 +90,15 @@ async function storeVerifiedSession(user: User) {
     httpOnly: true,
     secure: true,
     expires: expiresAt,
-    sameSite: 'lax',
-    path: '/'
+    sameSite: "lax",
+    path: "/",
   });
   cookieStore.set(certCookieName, await getHmac(userJson), {
     httpOnly: true,
     secure: true,
     expires: expiresAt,
-    sameSite: 'lax',
-    path: '/'
+    sameSite: "lax",
+    path: "/",
   });
 }
 
@@ -114,7 +114,7 @@ export async function getVerifiedSession() {
   const user = JSON.parse(userJson) as User;
 
   // Verify that the user was deserialized correctly and that the cert is correct
-  if (!user || await getHmac(userJson) != cert) {
+  if (!user || (await getHmac(userJson)) != cert) {
     return null;
   }
 
