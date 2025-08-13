@@ -1,7 +1,7 @@
 import rateLimit from "next-rate-limit";
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthLevel } from "@/lib/auth";
-import { AuthLevel } from "./lib/persist-module";
+import { AuthLevel } from "@/lib/persist-module";
 
 // TODO: Upgrade the rate limiter
 const limiter = rateLimit({
@@ -10,14 +10,16 @@ const limiter = rateLimit({
 });
 
 // Routes that are only available for admins
-const adminRoutes = ["/dashboard"];
+const adminRoutes = [/^\/admin\/.*/i];
 // Routes that are available for everyone
 const publicRoutes = [
-  "/shop/user/login",
-  "/shop/user/signup",
-  "/index",
-  "/llm",
-  "/favicon.ico",
+  /^\//i,
+  /^\/shop\/catalog/i,
+  /^\/shop\/item\/\d+/i,
+  /^\/shop\/user\/login/i,
+  /^\/shop\/user\/signup/i,
+  /^\/llm/i,
+  /^\/favicon.ico/i,
 ];
 
 export default async function middleware(request: NextRequest) {
@@ -29,8 +31,9 @@ export default async function middleware(request: NextRequest) {
       const path = request.nextUrl.pathname;
 
       const user_permitted =
-        publicRoutes.includes(path) ||
-        (auth_level == AuthLevel.Normal && !adminRoutes.includes(path)) ||
+        publicRoutes.some((route) => route.test(path)) ||
+        (auth_level == AuthLevel.Normal &&
+          !adminRoutes.some((route) => route.test(path))) ||
         auth_level == AuthLevel.Admin;
 
       if (user_permitted) {

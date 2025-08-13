@@ -15,9 +15,9 @@ async function openDb() {
 
 // Authentication
 export enum AuthLevel {
-  None,
-  Normal,
-  Admin,
+  None = 0,
+  Normal = 1,
+  Admin = 2,
 }
 
 export type User = {
@@ -32,11 +32,10 @@ export async function addUser(
   authLevel: number,
 ) {
   const insertUser = db.prepare(
-    "INSERT INTO Users (email, password, authLevel) VALUES (?, ?, ?)",
+    "INSERT INTO Users (email, password, authLevel) VALUES (?, ?, ?) RETURNING *",
   );
-  insertUser.run(email, hashedPassword, authLevel);
 
-  return getUser(email);
+  return insertUser.get(email, hashedPassword, authLevel) as User;
 }
 
 export async function getUser(email: string) {
@@ -46,11 +45,19 @@ export async function getUser(email: string) {
   return user;
 }
 
+export enum ItemType {
+  Duck = 0,
+  DuckColor = 1,
+  DuckHead = 2,
+  DuckBody = 3,
+}
+
 // Shop items
 export type ShopItem = {
   id: number;
   name: string;
   price: number;
+  type: ItemType;
 };
 
 export async function getShopItem(id: number) {
@@ -60,6 +67,42 @@ export async function getShopItem(id: number) {
   return shopItem;
 }
 
-export async function addShopItem(item: ShopItem) {
-  // TODO: Implement
+export async function getCatalog() {
+  const getCatalog = db.prepare(
+    `SELECT * FROM Items WHERE type = ${ItemType.Duck}`,
+  );
+  const catalog = getCatalog.all() as ShopItem[];
+
+  return catalog;
 }
+
+export async function addShopItem(
+  name: string,
+  price: number,
+  type: ItemType,
+  image: File,
+) {
+  const addShopItem = db.prepare(
+    "INSERT INTO Items (name, price, type) VALUES (?, ?, ?) RETURNING *",
+  );
+
+  const item = addShopItem.get(name, price, type) as ShopItem;
+
+  // TODO: Save the image
+  console.log(item);
+  console.log(image);
+
+  return item;
+}
+
+export type CustomDuck = {
+  color: number;
+  head: number;
+  body: number;
+};
+
+export type Purchase = {
+  userId: number;
+  date: Date;
+  details: {};
+};
