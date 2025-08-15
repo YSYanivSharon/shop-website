@@ -4,7 +4,6 @@ import "./globals.css";
 import ShopHeader from "./components/shop-header";
 import { ThemeProvider } from "next-themes";
 
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -35,6 +34,6 @@ export default function RootLayout({
           {children}
         </ThemeProvider>
       </body>
-    </html >
+    </html>
   );
 }
