@@ -1,18 +1,18 @@
 import Image from "next/image";
 
 const ducks = [
-  { id: 1, name: "Classic Quacker", price: "₪20", image: "/item-images/1.png" },
-  { id: 2, name: "Doctor Duck", price: "₪30", image: "/item-images/2.png" },
-  { id: 3, name: "Pirate Splash", price: "₪35", image: "/item-images/3.png" },
-  { id: 4, name: "Business Beak", price: "₪28", image: "/item-images/4.png" },
-  { id: 5, name: "Moo Moo Duck", price: "₪32", image: "/item-images/5.png" },
-  { id: 6, name: "The Queen Duck", price: "₪27", image: "/item-images/6.png" },
-  { id: 7, name: "Superhero Duck", price: "₪29", image: "/item-images/7.png" },
-  { id: 8, name: "Zen Duck", price: "₪26", image: "/item-images/8.png" },
-  { id: 9, name: "Little Red Quacking Hood", price: "₪27", image: "/item-images/9.png" },
-  { id: 10, name: "Boxing Bill", price: "₪25", image: "/item-images/10.png" },
-  { id: 11, name: "Teacher Duck", price: "₪32", image: "/item-images/11.png" },
-  { id: 12, name: "Pride Duck", price: "₪28", image: "/item-images/12.png" },
+  { id: 1, name: "Classic Quacker", price: 20},
+  { id: 2, name: "Doctor Duck", price: 30 },
+  { id: 3, name: "Pirate Splash", price: 35 },
+  { id: 4, name: "Business Beak", price: 28 },
+  { id: 5, name: "Moo Moo Duck", price: 32 },
+  { id: 6, name: "The Queen Duck", price: 27 },
+  { id: 7, name: "Superhero Duck", price: 29 },
+  { id: 8, name: "Zen Duck", price: 26 },
+  { id: 9, name: "Little Red Quacking Hood", price: 27 },
+  { id: 10, name: "Boxing Bill", price: 25 },
+  { id: 11, name: "Teacher Duck", price: 32 },
+  { id: 12, name: "Pride Duck", price: 28 },
 ];
 
 export default function Page() {
@@ -23,17 +23,17 @@ export default function Page() {
         {ducks.map((duck) => (
           <div
             key={duck.id}
-            className="border rounded-2xl p-4 shadow-md hover:shadow-lg transition duration-200 text-center"
+            className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-md p-4 text-center hover:scale-105 transition-transform duration-300"
           >
             <Image
-              src={duck.image}
+              src={`/item-images/${duck.id}.png`}
               alt={duck.name}
               width={200}
               height={200}
               className="mx-auto mb-3 rounded"
             />
             <h2 className="font-semibold text-lg text-slate-900 dark:text-slate-100">{duck.name}</h2>
-            <p className="text-slate-600 dark:text-slate-300">{duck.price}</p>
+            <p className="text-slate-600 dark:text-slate-300">₪{duck.price}</p>
           </div>
         ))}
       </div>

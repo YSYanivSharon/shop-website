@@ -4,7 +4,6 @@ import "./globals.css";
 import ShopHeader from "./components/shop-header";
 import { ThemeProvider } from "next-themes";
 
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -28,12 +27,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100`}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <ThemeProvider>
           <ShopHeader />
           {children}
         </ThemeProvider>
       </body>
-    </html >
+    </html>
   );
 }

@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
+import {ShopItem} from "@/app/lib/shop-item-data";
 
-const featuredDucks = [
-  { id: 1, name: "Classic Quacker", image: "/item-images/1.png", price: "₪20" },
-  { id: 2, name: "Doctor Duck", image: "/item-images/2.png", price: "₪30" },
-  { id: 3, name: "Boxing Bill", image: "/item-images/10.png", price: "₪25" },
+const featuredDucks: ShopItem[] = [
+  { id: 1, name: "Classic Quacker", price: 20 },
+  { id: 2, name: "Doctor Duck", price: 30 },
+  { id: 10, name: "Boxing Bill", price: 25 },
 ];
 
 export default function HomePage() {
@@ -37,14 +38,14 @@ export default function HomePage() {
               className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-md p-4 text-center hover:scale-105 transition-transform duration-300"
             >
               <Image
-                src={duck.image}
+                src={`/item-images/${duck.id}.png`}
                 alt={duck.name}
                 width={200}
                 height={200}
                 className="mx-auto rounded-full"
               />
               <h3 className="mt-4 text-lg font-bold text-yellow-800 dark:text-yellow-300">{duck.name}</h3>
-              <p className="text-gray-700 dark:text-gray-300 font-semibold">{duck.price}</p>
+              <p className="text-gray-700 dark:text-gray-300 font-semibold">₪{duck.price}</p>
             </div>
           ))}
         </div>
