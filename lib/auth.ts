@@ -3,8 +3,7 @@
 import crypto from "node:crypto";
 import { cookies } from "next/headers";
 import { getUser, addUser } from "@/lib/persist-module";
-import type { User } from "@/lib/persist-module";
-import { AuthLevel } from "@/lib/persist-module";
+import { User, AuthLevel } from "@/lib/types";
 
 const userCookieName = "user";
 const certCookieName = "cert";
