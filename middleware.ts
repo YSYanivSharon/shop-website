@@ -1,7 +1,7 @@
 import rateLimit from "next-rate-limit";
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthLevel } from "@/lib/auth";
-import { AuthLevel } from "@/lib/persist-module";
+import { AuthLevel } from "@/lib/types";
 
 // TODO: Upgrade the rate limiter
 const limiter = rateLimit({

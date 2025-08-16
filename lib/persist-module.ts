@@ -1,6 +1,8 @@
 "use server";
 
 import sqlite from "better-sqlite3";
+import fs from "fs";
+import { User, ShopItem, ItemType } from "@/lib/types";
 
 const db = await openDb();
 
@@ -14,18 +16,6 @@ async function openDb() {
 }
 
 // Authentication
-export enum AuthLevel {
-  None = 0,
-  Normal = 1,
-  Admin = 2,
-}
-
-export type User = {
-  email: string;
-  password: string;
-  authLevel: AuthLevel;
-};
-
 export async function addUser(
   email: string,
   hashedPassword: string,
@@ -45,21 +35,7 @@ export async function getUser(email: string) {
   return user;
 }
 
-export enum ItemType {
-  Duck = 0,
-  DuckColor = 1,
-  DuckHead = 2,
-  DuckBody = 3,
-}
-
 // Shop items
-export type ShopItem = {
-  id: number;
-  name: string;
-  price: number;
-  type: ItemType;
-};
-
 export async function getShopItem(id: number) {
   const getShopItem = db.prepare("SELECT * FROM Items WHERE id = ?");
   const shopItem = getShopItem.get(id) as ShopItem;
@@ -82,27 +58,23 @@ export async function addShopItem(
   type: ItemType,
   image: File,
 ) {
+  if (image.type != "image/png") {
+    return "Image file must be a png";
+  }
+
   const addShopItem = db.prepare(
     "INSERT INTO Items (name, price, type) VALUES (?, ?, ?) RETURNING *",
   );
 
   const item = addShopItem.get(name, price, type) as ShopItem;
 
-  // TODO: Save the image
-  console.log(item);
-  console.log(image);
+  fs.writeFile(
+    `public/item-images/${item.id}.png`,
+    Buffer.from(await image.arrayBuffer()),
+    (err) => {
+      console.log("Failed to save image: ", err);
+    },
+  );
 
   return item;
 }
-
-export type CustomDuck = {
-  color: number;
-  head: number;
-  body: number;
-};
-
-export type Purchase = {
-  userId: number;
-  date: Date;
-  details: {};
-};
