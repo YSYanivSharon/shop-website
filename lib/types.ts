@@ -1,3 +1,7 @@
+export interface Dictionary<T> {
+  [key: string]: T;
+}
+
 export enum AuthLevel {
   None = 0,
   Normal = 1,
@@ -5,9 +9,11 @@ export enum AuthLevel {
 }
 
 export type User = {
+  id: number;
   email: string;
   password: string;
   authLevel: AuthLevel;
+  wishlist: number[];
 };
 
 export type ShopItem = {
