@@ -20,9 +20,10 @@ export default function Page() {
 
   return (
     <main className="p-6">
-      <h1 className="text-3xl md:text-4xl font-bold text-center mb-8 text-slate-900 dark:text-white">
+      <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-center mb-10">
         Choose your Duck
       </h1>
+
       <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {catalog.map((item) => (
           <Link
