@@ -20,6 +20,15 @@ export const metadata: Metadata = {
   description: "The center for all things rubber duck",
 };
 
+//free shipping over 250
+function FreeShippingBar() {
+  return (
+    <div className="bg-yellow-400 text-black text-center py-2 text-sm font-semibold">
+      Free shipping on orders over ₪250! 🚚
+    </div>
+  );
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -32,6 +41,7 @@ export default function RootLayout({
       >
         <UserProvider>
           <ThemeProvider>
+            <FreeShippingBar />
             <ShopHeader />
             {children}
           </ThemeProvider>

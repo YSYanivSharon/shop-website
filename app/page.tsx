@@ -11,12 +11,11 @@ const featuredDucks: ShopItem[] = [
 export default function HomePage() {
   return (
     <main className="flex-1 py-10 px-6">
-      {/* the biggest header */}
       <section className="text-center mb-12">
-        <h1 className="text-4xl font-extrabold text-yellow-600 dark:text-yellow-400 mb-4">
+        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-6">
           Welcome to Duck World!
         </h1>
-        <p className="text-lg text-gray-700 dark:text-gray-300 mb-6">
+        <p className="text-2xl text-gray-700 dark:text-gray-300 mb-6">
           Discover the most special ducks on the web.
         </p>
         <Link href="/shop/catalog">
@@ -26,7 +25,6 @@ export default function HomePage() {
         </Link>
       </section>
 
-      {/* selected ducks */}
       <section>
         <h2 className="text-2xl font-bold text-center text-yellow-700 dark:text-yellow-300 mb-6">
           ⭐ Featured Ducks
