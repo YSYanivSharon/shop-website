@@ -18,7 +18,7 @@ import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
 export default function Page({ params }: { params: Promise<{ id: number }> }) {
   const [mounted, setMounted] = useState(false);
   const { id } = use(params);
-  const [item, setItem] = useState<ShopItem | null>(null);
+  const [item, setItem] = useState<ShopItem | null | undefined>(undefined);
   const [count, setCount] = useState<number>(1);
 
   useEffect(() => {
@@ -62,7 +62,10 @@ export default function Page({ params }: { params: Promise<{ id: number }> }) {
 
   return (
     <main className="max-w-4xl mx-auto p-6">
-      {(!item || item?.type != ItemType.Duck) && <>Invalid item</>}
+      {item === undefined && <>Loading</>}
+      {(item === null || (item && item?.type != ItemType.Duck)) && (
+        <>Invalid item</>
+      )}
       {item && item.type == ItemType.Duck && (
         <div className="flex flex-col md:flex-row gap-10 items-center md:items-start">
           This is the item page for:
@@ -89,7 +92,7 @@ export default function Page({ params }: { params: Promise<{ id: number }> }) {
           <Button
             type="button"
             onClick={(_) => {
-              addItemToCart(item.id, count);
+              addItemToCart(item, count);
             }}
           >
             Add to cart

@@ -25,19 +25,26 @@ export type ShopItem = {
 
 export enum ItemType {
   Duck = 0,
-  DuckColor = 1,
-  DuckHead = 2,
-  DuckBody = 3,
+  CustomDuck = 1,
+  DuckColor = 2,
+  DuckHead = 3,
+  DuckBody = 4,
 }
-
-export type CustomDuck = {
-  color: number;
-  head: number;
-  body: number;
-};
 
 export type Purchase = {
   userId: number;
   date: Date;
-  details: {};
+  items: PurchaseEntry[];
+};
+
+export type PurchaseEntry = {
+  item: ShopItem | CustomDuck;
+  count: number;
+};
+
+export type CustomDuck = {
+  id: 0;
+  color: ShopItem;
+  head: ShopItem;
+  body: ShopItem;
 };

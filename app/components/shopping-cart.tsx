@@ -1,33 +1,60 @@
 "use client";
 
-import { Dictionary } from "@/lib/types";
+import { PurchaseEntry, ShopItem } from "@/lib/types";
 
 const CartKey = "cart";
 
-function getCart() {
-  return JSON.parse(
-    localStorage.getItem(CartKey) ?? "{}",
-  ) as Dictionary<number>;
+export function getCart() {
+  return JSON.parse(localStorage.getItem(CartKey) ?? "[]") as PurchaseEntry[];
 }
 
-function setCart(cart: Dictionary<number>) {
+function setCart(cart: PurchaseEntry[]) {
   localStorage.setItem(CartKey, JSON.stringify(cart));
 }
 
-export function addItemToCart(itemId: number, count: number) {
+export function addEntryToCart(entry: PurchaseEntry) {
   const cart = getCart();
-  cart[itemId] = (cart[itemId] ?? 0) + count;
+  const cartEntry = cart.find((cartEntry) => {
+    cartEntry.item == entry.item;
+  });
+
+  if (cartEntry) {
+    cartEntry.count += entry.count;
+  } else {
+    cart.push(entry);
+  }
+
   setCart(cart);
+  return cart;
 }
 
-export function setItemCountInCart(itemId: number, count: number) {
-  const cart = getCart();
-  cart[itemId] = count;
-  setCart(cart);
+export function addItemToCart(item: ShopItem, count: number) {
+  addEntryToCart({ item: item, count: count });
 }
 
-export function removeItemFromCart(itemId: number) {
+export function addCustomDuckToCart(
+  color: ShopItem,
+  head: ShopItem,
+  body: ShopItem,
+) {
+  addEntryToCart({
+    item: { id: 0, color: color, head: head, body: body },
+    count: 1,
+  });
+}
+
+export function setEntryCountInCart(entryIndex: number, count: number) {
   const cart = getCart();
-  delete cart[itemId];
+
+  cart[entryIndex].count = count;
+
   setCart(cart);
+  return cart;
+}
+
+export function removeEntryFromCart(entryIndex: number) {
+  let cart = getCart();
+  cart = cart.filter((_, index) => index != entryIndex);
+  setCart(cart);
+  return cart;
 }
