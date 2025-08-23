@@ -45,9 +45,9 @@ export async function getShopItem(id: number) {
 
 export async function getCatalog() {
   const getCatalog = db.prepare(
-    `SELECT * FROM Items WHERE type = ${ItemType.Duck}`,
+    "SELECT * FROM Items WHERE type = ?"
   );
-  const catalog = getCatalog.all() as ShopItem[];
+  const catalog = getCatalog.all(ItemType.Duck) as ShopItem[];
 
   return catalog;
 }

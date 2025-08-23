@@ -20,14 +20,7 @@ export const metadata: Metadata = {
   description: "The center for all things rubber duck",
 };
 
-//free shipping over 250
-function FreeShippingBar() {
-  return (
-    <div className="bg-yellow-400 text-black text-center py-2 text-sm font-semibold">
-      Free shipping on orders over ₪250! 🚚
-    </div>
-  );
-}
+import FreeShippingBar from "@/app/components/free-shipping-bar";
 
 export default function RootLayout({
   children,
@@ -41,8 +34,10 @@ export default function RootLayout({
       >
         <UserProvider>
           <ThemeProvider>
-            <FreeShippingBar />
-            <ShopHeader />
+            <div className="sticky top-0 z-40 bg-white">
+              <FreeShippingBar />
+              <ShopHeader />
+            </div>
             {children}
           </ThemeProvider>
         </UserProvider>
