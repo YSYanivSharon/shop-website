@@ -15,7 +15,7 @@ function setCart(cart: PurchaseEntry[]) {
 export function addEntryToCart(entry: PurchaseEntry) {
   const cart = getCart();
   const cartEntry = cart.find((cartEntry) => {
-    cartEntry.item == entry.item;
+    return JSON.stringify(cartEntry.item) == JSON.stringify(entry.item);
   });
 
   if (cartEntry) {
