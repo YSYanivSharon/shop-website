@@ -2,7 +2,13 @@
 
 import sqlite from "better-sqlite3";
 import fs from "fs";
-import { AuthLevel, User, ShopItem, ItemType } from "@/lib/types";
+import {
+  AuthLevel,
+  User,
+  ShopItem,
+  ItemType,
+  CustomDuckPartsCatalog,
+} from "@/lib/types";
 import { getVerifiedSession } from "@/lib/auth";
 
 const db = await openDb();
@@ -65,10 +71,20 @@ export async function getShopItem(id: number) {
 }
 
 export async function getCatalog() {
-  const getCatalog = db.prepare("SELECT * FROM Items WHERE type = ?");
-  const catalog = getCatalog.all(ItemType.Duck) as ShopItem[];
+  const getProductsOfType = db.prepare("SELECT * FROM Items WHERE type = ?");
+  const catalog = getProductsOfType.all(ItemType.Duck) as ShopItem[];
 
   return catalog;
+}
+
+export async function getDuckParts() {
+  const getProductsOfType = db.prepare("SELECT * FROM Items WHERE type = ?");
+
+  const colors = getProductsOfType.all(ItemType.DuckColor) as ShopItem[];
+  const heads = getProductsOfType.all(ItemType.DuckHead) as ShopItem[];
+  const bodies = getProductsOfType.all(ItemType.DuckBody) as ShopItem[];
+
+  return { colors, heads, bodies } as CustomDuckPartsCatalog;
 }
 
 export async function addShopItem(

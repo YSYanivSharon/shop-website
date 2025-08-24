@@ -48,3 +48,9 @@ export type CustomDuck = {
   head: ShopItem;
   body: ShopItem;
 };
+
+export type CustomDuckPartsCatalog = {
+  colors: ShopItem[];
+  heads: ShopItem[];
+  bodies: ShopItem[];
+};

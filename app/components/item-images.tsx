@@ -17,27 +17,24 @@ export function getImageOfItem(item: ShopItem) {
 
 export function getImageOfCustomDuck(customDuck: CustomDuck) {
   return (
-    <div>
+    <div className="relative w-[200px] h-[200px] mx-auto">
       <Image
         src={`/item-images/${customDuck.color.id}.png`}
         alt={customDuck.color.name}
-        width={200}
-        height={200}
-        className="mx-auto mb-3 rounded"
+        fill
+        className="absolute top-0 left-0 rounded object-contain"
       />
       <Image
         src={`/item-images/${customDuck.head.id}.png`}
         alt={customDuck.head.name}
-        width={200}
-        height={200}
-        className="mx-auto mb-3 rounded"
+        fill
+        className="absolute top-0 left-0 rounded object-contain"
       />
       <Image
         src={`/item-images/${customDuck.body.id}.png`}
         alt={customDuck.body.name}
-        width={200}
-        height={200}
-        className="mx-auto mb-3 rounded"
+        fill
+        className="absolute top-0 left-0 rounded object-contain"
       />
     </div>
   );
