@@ -34,7 +34,7 @@ export default function RootLayout({
       >
         <UserProvider>
           <ThemeProvider>
-            <div className="sticky top-0 z-40 bg-white">
+            <div className="sticky top-0 z-40 bg-white dark:bg-black">
               <FreeShippingBar />
               <ShopHeader />
             </div>
@@ -45,3 +45,4 @@ export default function RootLayout({
     </html>
   );
 }
+
