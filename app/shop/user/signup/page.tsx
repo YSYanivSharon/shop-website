@@ -3,6 +3,7 @@
 import { FormEvent, useState, useContext } from "react";
 import { signup, UserContext } from "@/app/components/user-provider";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Page() {
   const [email, setEmail] = useState<string>("");
@@ -79,15 +80,16 @@ export default function Page() {
 
           <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-4">
             Already have an account?{" "}
-            <a
+            <Link
               href="/shop/user/login"
               className="text-yellow-500 font-semibold hover:underline"
             >
               Login
-            </a>
+            </Link>
           </p>
         </div>
       </div>
     </main>
   );
 }
+
