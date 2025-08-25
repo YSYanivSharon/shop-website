@@ -8,16 +8,18 @@ export function getImageOfItem(item: ShopItem) {
     <Image
       src={`/item-images/${item.id}.png`}
       alt={item.name}
-      width={200}
-      height={200}
-      className="mx-auto mb-3 rounded"
+      className="mx-auto mb-3 rounded aspect-square w-1 max-w-[500px] min-w-[100px]"
     />
   );
 }
 
 export function getImageOfCustomDuck(customDuck: CustomDuck) {
   return (
-    <div className="relative w-[200px] h-[200px] mx-auto">
+    <div
+      className={
+        "relative mx-auto aspect-square w-full max-w-[500px] min-w-[100px]"
+      }
+    >
       <Image
         src={`/item-images/${customDuck.color.id}.png`}
         alt={customDuck.color.name}
