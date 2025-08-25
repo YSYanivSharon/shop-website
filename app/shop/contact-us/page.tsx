@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   ChatBubbleLeftIcon,
   PhoneIcon,
@@ -71,7 +70,7 @@ export default function Page() {
 
       <section className="mt-0 flex justify-center">
         <img
-          src="/item-images/ducks.png"
+          src="/contact-us/ducks.png"
           alt="Row of ducks"
           className="w-[800px] h-[350px] object-contain"
         />

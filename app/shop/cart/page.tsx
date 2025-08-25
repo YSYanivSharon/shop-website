@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import { Button, Input } from "@headlessui/react";
+import Link from "next/link";
 import { PurchaseEntry, ShopItem, CustomDuck } from "@/lib/types";
 import {
   getCart,
@@ -14,7 +14,7 @@ import {
   getImageOfCustomDuck,
   getImageOfItem,
 } from "@/app/components/item-images";
-import { TrashIcon } from "@heroicons/react/24/solid";
+import { TrashIcon, CreditCardIcon } from "@heroicons/react/24/solid";
 
 export default function Page() {
   const [cart, setCart] = useState<PurchaseEntry[]>([]);
@@ -95,5 +95,18 @@ export default function Page() {
     );
   }
 
-  return <div>{cart.map((entry, index) => getEntryElement(entry, index))}</div>;
+  return (
+    <div>
+      <div>
+        {cart.length == 0 && <p>The shopping cart is empty</p>}
+        {cart.length > 0 &&
+          cart.map((entry, index) => getEntryElement(entry, index))}
+      </div>
+      <Link href="/shop/checkout" className="flex">
+        <CreditCardIcon className="size-6" />
+        <span className="w-1.5" />
+        Checkout
+      </Link>
+    </div>
+  );
 }
