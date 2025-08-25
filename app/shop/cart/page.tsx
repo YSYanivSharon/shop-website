@@ -81,7 +81,7 @@ export default function Page() {
     return (
       <>
         {getImageOfItem(item)}
-        <p>Item {item.id}</p>
+        <p>{item.name}</p>
       </>
     );
   }
