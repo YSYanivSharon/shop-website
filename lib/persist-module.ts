@@ -52,14 +52,18 @@ export async function addUser(
 
   const dbUser = insertUser.get(email, hashedPassword, authLevel) as DBUser;
 
-  return DBUserToUser(dbUser);
+  if (dbUser) return DBUserToUser(dbUser);
+
+  return null;
 }
 
 export async function getUser(email: string) {
   const getUser = db.prepare("SELECT * FROM Users WHERE email = ?");
   const dbUser = getUser.get(email) as DBUser;
 
-  return DBUserToUser(dbUser);
+  if (dbUser) return DBUserToUser(dbUser);
+
+  return null;
 }
 
 // Shop items
