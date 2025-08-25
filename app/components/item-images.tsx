@@ -1,5 +1,3 @@
-"use client";
-
 import { CustomDuck, ShopItem } from "@/lib/types";
 import Image from "next/image";
 
@@ -10,7 +8,7 @@ export function getImageOfItem(item: ShopItem) {
       alt={item.name}
       width={200}
       height={200}
-      className="mx-auto mb-3 rounded aspect-square w-1 max-w-[500px] min-w-[100px]"
+      className="mx-auto mb-3 rounded aspect-square max-w-[500px] min-w-[100px]"
     />
   );
 }
