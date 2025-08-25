@@ -56,7 +56,7 @@ export default function ShopHeader() {
             <div className="w-px border" />
 
             <Link
-              href="/shop/contactus"
+              href="/shop/contact-us"
               className="flex font-semibold py-1 px-6 transition"
             >
               <PhoneIcon className="size-6" />
