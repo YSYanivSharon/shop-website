@@ -1,14 +1,13 @@
-import Image from "next/image";
 import Link from "next/link";
-import { ShopItem } from "@/app/lib/shop-item-data";
+import { getShopItem } from "@/lib/persist-module";
+import { getImageOfItem } from "./components/item-images";
 
-const featuredDucks: ShopItem[] = [
-  { id: 1, name: "Classic Quacker", price: 20 },
-  { id: 2, name: "Doctor Duck", price: 30 },
-  { id: 10, name: "Boxing Bill", price: 25 },
-];
-
-export default function HomePage() {
+export default async function HomePage() {
+  const featuredDucksIds: number[] = [1, 2, 10];
+  const featuredDucks = [];
+  for (var id of featuredDucksIds) {
+    featuredDucks.push(await getShopItem(id));
+  }
   return (
     <main className="flex-1 py-10 px-6">
       <section className="text-center mb-12">
@@ -31,24 +30,19 @@ export default function HomePage() {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
           {featuredDucks.map((duck) => (
-            <div
+            <Link
+              href={`/shop/item/${duck.id}`}
               key={duck.id}
               className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-md p-4 text-center hover:scale-105 transition-transform duration-300"
             >
-              <Image
-                src={`/item-images/${duck.id}.png`}
-                alt={duck.name}
-                width={200}
-                height={200}
-                className="mx-auto rounded-full"
-              />
+              {getImageOfItem(duck)}
               <h3 className="mt-4 text-lg font-bold text-yellow-800 dark:text-yellow-300">
                 {duck.name}
               </h3>
               <p className="text-gray-700 dark:text-gray-300 font-semibold">
                 ₪{duck.price}
               </p>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
