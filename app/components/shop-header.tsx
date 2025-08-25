@@ -9,12 +9,15 @@ import {
   ArrowRightEndOnRectangleIcon,
   HomeIcon,
   PhoneIcon,
+  ChartBarIcon,
+  PlusIcon,
 } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ThemeToggle } from "@/app/components/theme-toggle";
 import { useContext, useEffect, useState } from "react";
 import { UserContext } from "@/app/components/user-provider";
+import { AuthLevel } from "@/lib/types";
 
 export default function ShopHeader() {
   const [mounted, setMounted] = useState(false);
@@ -25,6 +28,7 @@ export default function ShopHeader() {
 
   const user = useContext(UserContext);
   const email = mounted ? user?.email : null;
+  const isAdmin = mounted ? user?.authLevel == AuthLevel.Admin : false;
 
   return (
     <header className="sticky top-0 z-50 shadow bg-white dark:bg-black">
@@ -88,7 +92,10 @@ export default function ShopHeader() {
             )}
             {email && (
               <Menu>
-                <MenuButton>{email}</MenuButton>
+                <MenuButton className="flex texflex px-6 py-1">
+                  <UserIcon className="size-6" />
+                  {email}
+                </MenuButton>
                 <MenuItems
                   anchor="bottom"
                   className="border rounded-b-lg bg-white dark:bg-black"
@@ -102,6 +109,28 @@ export default function ShopHeader() {
                       My Items
                     </Link>
                   </MenuItem>
+                  {isAdmin && (
+                    <>
+                      <MenuItem>
+                        <Link
+                          href="/admin/dashboard"
+                          className="flex texflex font-semibold py-1 px-6 transition border"
+                        >
+                          <ChartBarIcon className="size-6" />
+                          Dashboard
+                        </Link>
+                      </MenuItem>
+                      <MenuItem>
+                        <Link
+                          href="/admin/add-item"
+                          className="flex texflex font-semibold py-1 px-6 transition border"
+                        >
+                          <PlusIcon className="size-6" />
+                          Add Item
+                        </Link>
+                      </MenuItem>
+                    </>
+                  )}
                   <MenuItem>
                     <Link
                       href="/shop/user/logout"
