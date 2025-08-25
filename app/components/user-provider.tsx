@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "@/lib/persist-module";
+import { User } from "@/lib/types";
 import {
   createContext,
   useState,
@@ -9,6 +9,10 @@ import {
   SetStateAction,
 } from "react";
 import * as Server from "@/lib/auth";
+import {
+  tryAddItemToWishlist as tryAddItemToServerWishlist,
+  tryRemoveItemFromWishlist as tryRemoveItemFromServerWishlist,
+} from "@/lib/persist-module";
 
 export const StorageKey = "user";
 const isServer = typeof window === "undefined";
@@ -72,4 +76,28 @@ export async function login(email: string, password: string) {
 export async function logout() {
   await Server.logout();
   setCurrUser(null);
+}
+
+export async function tryAddItemToWishlist(itemId: number) {
+  const succeeded = await tryAddItemToServerWishlist(itemId);
+
+  if (succeeded) {
+    let newUserState = loadCurrUser();
+    newUserState?.wishlist.push(itemId);
+    setCurrUser(newUserState);
+  }
+}
+
+export async function tryRemoveItemFromWishlist(itemId: number) {
+  const succeeded = await tryRemoveItemFromServerWishlist(itemId);
+
+  if (succeeded) {
+    let newUserState = loadCurrUser();
+    if (newUserState) {
+      newUserState.wishlist = newUserState?.wishlist.filter(
+        (item) => item != itemId,
+      );
+      setCurrUser(newUserState);
+    }
+  }
 }

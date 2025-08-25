@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ShopItem, getCatalog } from "@/lib/persist-module";
+import { getCatalog } from "@/lib/persist-module";
+import { ShopItem } from "@/lib/types";
 import { useEffect, useState } from "react";
 
 export default function Page() {
