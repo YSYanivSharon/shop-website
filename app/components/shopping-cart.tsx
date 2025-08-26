@@ -58,3 +58,7 @@ export function removeEntryFromCart(entryIndex: number) {
   setCart(cart);
   return cart;
 }
+
+export function clearCart() {
+  setCart([]);
+}

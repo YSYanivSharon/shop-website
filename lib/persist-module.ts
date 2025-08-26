@@ -8,6 +8,9 @@ import {
   ShopItem,
   ItemType,
   CustomDuckPartsCatalog,
+  PurchaseEntry,
+  Purchase,
+  CreditCardDetails,
 } from "@/lib/types";
 import { getVerifiedSession } from "@/lib/auth";
 
@@ -168,4 +171,77 @@ export async function tryRemoveItemFromWishlist(itemId: number) {
   });
 
   return await trySetWishlist(wishlist);
+}
+
+export async function getShippingPrice(address: PaymentAddress) {
+  // Pretend that there is actual logic here
+  return 10;
+}
+
+export async function pay(cart: PurchaseEntry[], card: CreditCardDetails) {
+  const user = await getVerifiedSession();
+
+  if (!user) return false;
+
+  // Recalculate the price and remove invalid items in case that the user manipulated the cart
+  var price = 0;
+  var actualCart = [];
+
+  for (var entry of cart) {
+    var item = await getShopItem(entry.item.id);
+    if (item) {
+      price += item.price;
+      actualCart.push(entry);
+    }
+  }
+
+  // Fail if there are no valid items
+  if (actualCart.length == 0) {
+    return false;
+  }
+
+  // Pretend that there is actual logic here for the payment
+
+  // Save the purchase
+  const addPurchase = db.prepare(
+    "INSERT INTO Purchases (userId, date, details) VALUES (?, ?, ?)",
+  );
+
+  const results = addPurchase.run(
+    user.id,
+    Date.now(),
+    JSON.stringify(actualCart),
+  );
+
+  return results.changes > 0;
+}
+
+type DBPurchase = {
+  userId: number;
+  date: Date;
+  details: string;
+};
+
+function dbPurchaseToPurchase(dbPurchase: DBPurchase) {
+  return {
+    userId: dbPurchase.userId,
+    date: dbPurchase.date,
+    details: JSON.parse(dbPurchase.details),
+  } as Purchase;
+}
+
+export async function getPurchaseHistory() {
+  const user = await getVerifiedSession();
+
+  if (!user) return false;
+
+  const getPurchasesOfUser = db.prepare(
+    "SELECT * FROM Purchases WHERE userId = ?",
+  );
+
+  const dbPurchaseHistory = getPurchasesOfUser.all(user.id) as DBPurchase[];
+
+  const purchaseHistory = dbPurchaseHistory.map(dbPurchaseToPurchase);
+
+  return purchaseHistory;
 }
