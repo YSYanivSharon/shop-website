@@ -57,10 +57,10 @@ export default function Page() {
   function toggleWishlist() {
     if (!user) return;
     if (wishlisted) {
-      tryRemoveItemFromWishlist(9999);
+      tryRemoveItemFromWishlist(0);
       setWishlisted(false);
     } else {
-      tryAddItemToWishlist(9999);
+      tryAddItemToWishlist(0);
       setWishlisted(true);
     }
   }
@@ -139,18 +139,6 @@ export default function Page() {
                 Add to Cart
               </Button>
 
-              {user && (
-                <Button
-                  className="w-14 flex items-center justify-center rounded-lg bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 transition"
-                  onClick={toggleWishlist}
-                >
-                  {wishlisted ? (
-                    <SolidHeartIcon className="w-6 h-6 text-red-500" />
-                  ) : (
-                    <OutlineHeartIcon className="w-6 h-6 text-gray-600 dark:text-gray-300" />
-                  )}
-                </Button>
-              )}
             </div>
           </div>
         )}
