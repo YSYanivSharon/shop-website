@@ -32,9 +32,12 @@ export enum ItemType {
 }
 
 export type Purchase = {
+  id: number;
   userId: number;
   date: Date;
-  details: PurchaseEntry[];
+  entries: PurchaseEntry[];
+  shippingPrice: number;
+  address: PaymentAddress;
 };
 
 export type PurchaseEntry = {

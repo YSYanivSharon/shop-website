@@ -178,7 +178,11 @@ export async function getShippingPrice(address: PaymentAddress) {
   return 10;
 }
 
-export async function pay(cart: PurchaseEntry[], card: CreditCardDetails) {
+export async function pay(
+  cart: PurchaseEntry[],
+  address: PaymentAddress,
+  card: CreditCardDetails,
+) {
   const user = await getVerifiedSession();
 
   if (!user) return false;
@@ -200,33 +204,44 @@ export async function pay(cart: PurchaseEntry[], card: CreditCardDetails) {
     return false;
   }
 
+  const shippingPrice = await getShippingPrice(address);
+  price += shippingPrice;
+
   // Pretend that there is actual logic here for the payment
 
   // Save the purchase
   const addPurchase = db.prepare(
-    "INSERT INTO Purchases (userId, date, details) VALUES (?, ?, ?)",
+    "INSERT INTO Purchases (userId, date, entries, shippingPrice, address) VALUES (?, ?, ?, ?, ?)",
   );
 
   const results = addPurchase.run(
     user.id,
     Date.now(),
     JSON.stringify(actualCart),
+    shippingPrice,
+    JSON.stringify(address),
   );
 
   return results.changes > 0;
 }
 
 type DBPurchase = {
+  id: number;
   userId: number;
   date: Date;
-  details: string;
+  entries: string;
+  shippingPrice: number;
+  address: string;
 };
 
 function dbPurchaseToPurchase(dbPurchase: DBPurchase) {
   return {
+    id: dbPurchase.id,
     userId: dbPurchase.userId,
     date: dbPurchase.date,
-    details: JSON.parse(dbPurchase.details),
+    entries: JSON.parse(dbPurchase.entries),
+    shippingPrice: dbPurchase.shippingPrice,
+    address: JSON.parse(dbPurchase.address),
   } as Purchase;
 }
 

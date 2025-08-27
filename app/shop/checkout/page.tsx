@@ -9,7 +9,7 @@ import {
   CreditCardDetails,
 } from "@/lib/types";
 import { clearCart, getCart } from "@/app/components/shopping-cart";
-import { getShopItem, pay } from "@/lib/persist-module";
+import { getShippingPrice, getShopItem, pay } from "@/lib/persist-module";
 import {
   getImageOfCustomDuck,
   getImageOfItem,
@@ -22,6 +22,9 @@ export default function Page() {
   const [cart, setCart] = useState<PurchaseEntry[]>([]);
   const [customDuckPrice, setCustomDuckPrice] = useState<number>(0);
   const [mounted, setMounted] = useState(false);
+  const [address, setAddress] = useState<PaymentAddress | null>(null);
+  const [creditCardDetails, setCreditCardDetails] =
+    useState<CreditCardDetails | null>(null);
 
   useEffect(() => {
     const loadCart = async function () {
@@ -77,8 +80,17 @@ export default function Page() {
   }
 
   async function onPay() {
-    // TODO: get the actual details
-    const successful = await pay(cart, {} as CreditCardDetails);
+    if (!address) {
+      // TODO: Notify the user that the address is invalid
+      return;
+    }
+
+    if (!creditCardDetails) {
+      // TODO: Notify the user that the credit card is invalid
+      return;
+    }
+
+    const successful = await pay(cart, address, creditCardDetails);
 
     if (successful) {
       clearCart();
@@ -95,6 +107,7 @@ export default function Page() {
         {cart.length > 0 &&
           cart.map((entry, index) => getEntryElement(entry, index))}
       </div>
+      <p>Shipping: {address ? getShippingPrice(address) : "TBD"}</p>
       <Button onClick={onPay} className="flex">
         <CreditCardIcon className="size-6" />
         <span className="w-1.5" />
