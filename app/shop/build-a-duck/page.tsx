@@ -54,17 +54,6 @@ export default function Page() {
     setTimeout(() => setMessage(null), 3000);
   }
 
-  function toggleWishlist() {
-    if (!user) return;
-    if (wishlisted) {
-      tryRemoveItemFromWishlist(0);
-      setWishlisted(false);
-    } else {
-      tryAddItemToWishlist(0);
-      setWishlisted(true);
-    }
-  }
-
   return (
     <div className="items-center justify-center flex flex-col w-full p-6">
       <div className="text-center mb-10 max-w-2xl">
