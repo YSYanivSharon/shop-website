@@ -1,11 +1,12 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useContext } from "react";
 import { addShopItem } from "@/lib/persist-module";
 import { ItemType } from "@/lib/types";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import {
   Combobox,
+  ComboboxInput,
   ComboboxButton,
   ComboboxOption,
   ComboboxOptions,
