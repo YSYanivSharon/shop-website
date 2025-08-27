@@ -8,6 +8,7 @@ import Link from "next/link";
 export default function Page() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [message, setMessage] = useState<string | null>(null);
   const user = useContext(UserContext);
   const router = useRouter();
 
@@ -17,13 +18,13 @@ export default function Page() {
     const result = await signup(email, password);
 
     if (typeof result === "string") {
-      // TODO: Handle signup fails
+      setMessage(`${result}`);
     } else {
-      router.back();
+      setMessage("Account created successfully!");
+      setTimeout(() => router.back(), 1500);
     }
   };
 
-  // If already signed in
   if (user) {
     router.back();
   }
@@ -77,6 +78,12 @@ export default function Page() {
               Sign Up
             </button>
           </form>
+
+          {message && (
+            <p className="text-center mt-4 text-sm font-medium text-red-500 dark:text-red-400">
+              {message}
+            </p>
+          )}
 
           <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-4">
             Already have an account?{" "}

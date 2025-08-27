@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 export default function Page() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [message, setMessage] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -16,9 +17,10 @@ export default function Page() {
     const user = await login(email, password);
 
     if (user) {
-      router.back();
+      setMessage("Login successful!");
+      setTimeout(() => router.back(), 1000);
     } else {
-      // TODO: Handle login fails
+      setMessage("Invalid email or password. Please try again.");
     }
   };
 
@@ -72,8 +74,14 @@ export default function Page() {
             </button>
           </form>
 
+          {message && (
+            <p className="text-center mt-4 text-sm font-medium text-red-500 dark:text-red-400">
+              {message}
+            </p>
+          )}
+
           <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-4">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               href="/shop/user/signup"
               className="text-yellow-500 font-semibold hover:underline"
