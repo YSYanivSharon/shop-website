@@ -11,6 +11,7 @@ import {
   PhoneIcon,
   ChartBarIcon,
   PlusIcon,
+  HeartIcon,
 } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
@@ -107,6 +108,15 @@ export default function ShopHeader() {
                     >
                       <ArchiveBoxIcon className="size-6" />
                       My Items
+                    </Link>
+                  </MenuItem>
+                  <MenuItem>
+                    <Link
+                      href="/shop/user/wishlist"
+                      className="flex texflex font-semibold py-1 px-6 transition border"
+                    >
+                      <HeartIcon className="size-6" />
+                      My Wishlist
                     </Link>
                   </MenuItem>
                   {isAdmin && (

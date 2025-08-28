@@ -83,9 +83,15 @@ export async function tryAddItemToWishlist(itemId: number) {
 
   if (succeeded) {
     let newUserState = loadCurrUser();
-    newUserState?.wishlist.push(itemId);
-    setCurrUser(newUserState);
+    if (newUserState) {
+      newUserState.wishlist.push(itemId);
+      setCurrUser(newUserState);
+
+      return true;
+    }
   }
+
+  return false;
 }
 
 export async function tryRemoveItemFromWishlist(itemId: number) {
@@ -94,10 +100,14 @@ export async function tryRemoveItemFromWishlist(itemId: number) {
   if (succeeded) {
     let newUserState = loadCurrUser();
     if (newUserState) {
-      newUserState.wishlist = newUserState?.wishlist.filter(
-        (item) => item != itemId,
+      newUserState.wishlist = newUserState.wishlist.filter(
+        (id) => id != itemId,
       );
       setCurrUser(newUserState);
+
+      return true;
     }
   }
+
+  return false;
 }

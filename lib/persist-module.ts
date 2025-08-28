@@ -12,7 +12,7 @@ import {
   Purchase,
   CreditCardDetails,
 } from "@/lib/types";
-import { getVerifiedSession } from "@/lib/auth";
+import { getVerifiedSession, storeVerifiedSession } from "@/lib/auth";
 
 const db = await openDb();
 
@@ -121,16 +121,13 @@ export async function addShopItem(
   return item;
 }
 
-async function getWishlist() {
+export async function getWishlist() {
   const user = await getVerifiedSession();
   if (!user) {
-    return null;
+    return [];
   }
 
-  const getWishlist = db.prepare("SELECT wishlist FROM Users WHERE id = ?");
-  const wishlist = (getWishlist.get(user.id) as { wishlist: string }).wishlist;
-
-  return JSON.parse(wishlist ?? "[]") as number[];
+  return user.wishlist;
 }
 
 async function trySetWishlist(wishlist: number[]) {
@@ -142,7 +139,14 @@ async function trySetWishlist(wishlist: number[]) {
   const setWishlist = db.prepare("UPDATE Users SET wishlist = ? WHERE id = ?");
   const runInfo = setWishlist.run(JSON.stringify(wishlist), user.id);
 
-  return runInfo.changes > 0;
+  if (runInfo.changes > 0) {
+    user.wishlist = wishlist;
+    await storeVerifiedSession(user);
+
+    return true;
+  }
+
+  return false;
 }
 
 export async function tryAddItemToWishlist(itemId: number) {
@@ -166,11 +170,11 @@ export async function tryRemoveItemFromWishlist(itemId: number) {
     return false;
   }
 
-  wishlist = wishlist.filter((id) => {
-    id != itemId;
-  });
+  const newWishlist = wishlist.filter((id) => id != itemId);
 
-  return await trySetWishlist(wishlist);
+  if (newWishlist.length == wishlist.length) return false;
+
+  return await trySetWishlist(newWishlist);
 }
 
 export async function getShippingPrice(address: PaymentAddress) {
