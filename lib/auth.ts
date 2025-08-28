@@ -81,7 +81,7 @@ export async function logout() {
   cookieStore.delete(certCookieName);
 }
 
-async function storeVerifiedSession(user: User) {
+export async function storeVerifiedSession(user: User) {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
   const cookieStore = await cookies();
   let userJson = JSON.stringify(user);

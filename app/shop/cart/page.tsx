@@ -97,16 +97,17 @@ export default function Page() {
 
   return (
     <div>
-      <div>
-        {cart.length == 0 && <p>The shopping cart is empty</p>}
-        {cart.length > 0 &&
-          cart.map((entry, index) => getEntryElement(entry, index))}
-      </div>
-      <Link href="/shop/checkout" className="flex">
-        <CreditCardIcon className="size-6" />
-        <span className="w-1.5" />
-        Checkout
-      </Link>
+      {cart.length == 0 && <p>The shopping cart is empty</p>}
+      {cart.length > 0 && (
+        <>
+          <div>{cart.map((entry, index) => getEntryElement(entry, index))}</div>
+          <Link href="/shop/checkout" className="flex">
+            <CreditCardIcon className="size-6" />
+            <span className="w-1.5" />
+            Checkout
+          </Link>
+        </>
+      )}
     </div>
   );
 }

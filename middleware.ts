@@ -10,16 +10,20 @@ const limiter = rateLimit({
 });
 
 // Routes that are only available for admins
-const adminRoutes = [/^\/admin\/.*/i];
+const adminRoutes = [/^\/admin\/.*$/i];
 // Routes that are available for everyone
 const publicRoutes = [
-  /^\//i,
-  /^\/shop\/catalog/i,
-  /^\/shop\/item\/\d+/i,
-  /^\/shop\/user\/login/i,
-  /^\/shop\/user\/signup/i,
-  /^\/llm/i,
-  /^\/favicon.ico/i,
+  /^\/$/i,
+  /^\/shop\/catalog$/i,
+  /^\/shop\/build-a-duck$/i,
+  /^\/shop\/contact-us$/i,
+  /^\/shop\/cart$/i,
+  /^\/shop\/item\/\d+$/i,
+  /^\/shop\/user\/login$/i,
+  /^\/shop\/user\/signup$/i,
+  /^\/llm$/i,
+  /^\/favicon.ico$/i,
+  /^\/images\/.*$/i,
 ];
 
 export default async function middleware(request: NextRequest) {

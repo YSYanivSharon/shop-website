@@ -4,21 +4,19 @@ import { useEffect, useState, useContext } from "react";
 import { getImageOfCustomDuck } from "@/app/components/item-images";
 import { CustomDuck, CustomDuckPartsCatalog, User } from "@/lib/types";
 import { getDuckParts } from "@/lib/persist-module";
-import { ChevronLeftIcon, ChevronRightIcon, HeartIcon as SolidHeartIcon } from "@heroicons/react/24/solid";
-import { HeartIcon as OutlineHeartIcon, ShoppingCartIcon } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { Button } from "@headlessui/react";
 import { addCustomDuckToCart } from "@/app/components/shopping-cart";
-import { UserContext, tryAddItemToWishlist, tryRemoveItemFromWishlist } from "@/app/components/user-provider";
+import { UserContext } from "@/app/components/user-provider";
 
 export default function Page() {
-  const [partsCatalog, setPartsCatalog] = useState<CustomDuckPartsCatalog | null>(null);
+  const [partsCatalog, setPartsCatalog] =
+    useState<CustomDuckPartsCatalog | null>(null);
   const [pickedColor, setPickedColor] = useState<number>(0);
   const [pickedHead, setPickedHead] = useState<number>(0);
   const [pickedBody, setPickedBody] = useState<number>(0);
   const [message, setMessage] = useState<string | null>(null);
-
-  const user = useContext(UserContext) as User | null;
-  const [wishlisted, setWishlisted] = useState(false);
 
   useEffect(() => {
     const loadParts = async () => {
@@ -35,11 +33,19 @@ export default function Page() {
     } as CustomDuck;
   }
 
-  function rotateRight(value: number, valueCount: number, setter: React.Dispatch<React.SetStateAction<number>>) {
+  function rotateRight(
+    value: number,
+    valueCount: number,
+    setter: React.Dispatch<React.SetStateAction<number>>,
+  ) {
     setter(value + 1 >= valueCount ? 0 : value + 1);
   }
 
-  function rotateLeft(value: number, valueCount: number, setter: React.Dispatch<React.SetStateAction<number>>) {
+  function rotateLeft(
+    value: number,
+    valueCount: number,
+    setter: React.Dispatch<React.SetStateAction<number>>,
+  ) {
     setter(value - 1 < 0 ? valueCount - 1 : value - 1);
   }
 
@@ -62,7 +68,9 @@ export default function Page() {
         </h1>
         <p className="text-gray-600 dark:text-gray-300 text-lg">
           Create your own custom duck! Mix and match colors, <br />
-          heads, and bodies to design the perfect duck friend for your collection.<br />
+          heads, and bodies to design the perfect duck friend for your
+          collection.
+          <br />
         </p>
       </div>
 
@@ -77,19 +85,37 @@ export default function Page() {
               <div className="flex flex-col gap-2">
                 <Button
                   className="px-7 py-10 rounded bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
-                  onClick={() => rotateLeft(pickedHead, partsCatalog.heads.length, setPickedHead)}
+                  onClick={() =>
+                    rotateLeft(
+                      pickedHead,
+                      partsCatalog.heads.length,
+                      setPickedHead,
+                    )
+                  }
                 >
                   <ChevronLeftIcon className="size-10" />
                 </Button>
                 <Button
                   className="px-7 py-10 rounded bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
-                  onClick={() => rotateLeft(pickedColor, partsCatalog.colors.length, setPickedColor)}
+                  onClick={() =>
+                    rotateLeft(
+                      pickedColor,
+                      partsCatalog.colors.length,
+                      setPickedColor,
+                    )
+                  }
                 >
                   <ChevronLeftIcon className="size-10" />
                 </Button>
                 <Button
                   className="px-7 py-10 rounded bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
-                  onClick={() => rotateLeft(pickedBody, partsCatalog.bodies.length, setPickedBody)}
+                  onClick={() =>
+                    rotateLeft(
+                      pickedBody,
+                      partsCatalog.bodies.length,
+                      setPickedBody,
+                    )
+                  }
                 >
                   <ChevronLeftIcon className="size-10" />
                 </Button>
@@ -100,19 +126,37 @@ export default function Page() {
               <div className="flex flex-col gap-2">
                 <Button
                   className="px-7 py-10 rounded bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
-                  onClick={() => rotateRight(pickedHead, partsCatalog.heads.length, setPickedHead)}
+                  onClick={() =>
+                    rotateRight(
+                      pickedHead,
+                      partsCatalog.heads.length,
+                      setPickedHead,
+                    )
+                  }
                 >
                   <ChevronRightIcon className="size-10" />
                 </Button>
                 <Button
                   className="px-7 py-10 rounded bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
-                  onClick={() => rotateRight(pickedColor, partsCatalog.colors.length, setPickedColor)}
+                  onClick={() =>
+                    rotateRight(
+                      pickedColor,
+                      partsCatalog.colors.length,
+                      setPickedColor,
+                    )
+                  }
                 >
                   <ChevronRightIcon className="size-10" />
                 </Button>
                 <Button
                   className="px-7 py-10 rounded bg-gray-300 hover:bg-gray-400 dark:bg-gray-700 dark:hover:bg-gray-600"
-                  onClick={() => rotateRight(pickedBody, partsCatalog.bodies.length, setPickedBody)}
+                  onClick={() =>
+                    rotateRight(
+                      pickedBody,
+                      partsCatalog.bodies.length,
+                      setPickedBody,
+                    )
+                  }
                 >
                   <ChevronRightIcon className="size-10" />
                 </Button>
@@ -127,7 +171,6 @@ export default function Page() {
                 <ShoppingCartIcon className="w-5 h-5" />
                 Add to Cart
               </Button>
-
             </div>
           </div>
         )}
@@ -140,3 +183,4 @@ export default function Page() {
     </div>
   );
 }
+

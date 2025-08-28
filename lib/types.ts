@@ -32,9 +32,12 @@ export enum ItemType {
 }
 
 export type Purchase = {
+  id: number;
   userId: number;
   date: Date;
-  items: PurchaseEntry[];
+  entries: PurchaseEntry[];
+  shippingPrice: number;
+  address: PaymentAddress;
 };
 
 export type PurchaseEntry = {
@@ -53,4 +56,12 @@ export type CustomDuckPartsCatalog = {
   colors: ShopItem[];
   heads: ShopItem[];
   bodies: ShopItem[];
+};
+
+export type CreditCardDetails = {
+  number: string;
+  expirationYear: number;
+  expirationMonth: number;
+  name: string;
+  code: number;
 };

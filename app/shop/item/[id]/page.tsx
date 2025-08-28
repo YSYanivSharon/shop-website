@@ -76,7 +76,7 @@ export default function Page({ params }: { params: Promise<{ id: number }> }) {
           {/* Image */}
           <div className="flex justify-center">
             <Image
-              src={`/item-images/${item.id}.png`}
+              src={`/images/item-images/${item.id}.png`}
               alt={item.name}
               width={350}
               height={350}
@@ -99,7 +99,9 @@ export default function Page({ params }: { params: Promise<{ id: number }> }) {
             </p>
 
             <div className="flex items-center gap-3 mb-6">
-              <label className="font-medium dark:text-gray-200">Quantity:</label>
+              <label className="font-medium dark:text-gray-200">
+                Quantity:
+              </label>
               <input
                 type="number"
                 value={count}
