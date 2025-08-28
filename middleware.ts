@@ -23,6 +23,7 @@ const publicRoutes = [
   /^\/shop\/user\/signup$/i,
   /^\/llm$/i,
   /^\/favicon.ico$/i,
+  /^\/images\/.*$/i,
 ];
 
 export default async function middleware(request: NextRequest) {

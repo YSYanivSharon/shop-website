@@ -111,7 +111,7 @@ export async function addShopItem(
   const item = addShopItem.get(name, price, type) as ShopItem;
 
   fs.writeFile(
-    `public/item-images/${item.id}.png`,
+    `public/images/item-images/${item.id}.png`,
     Buffer.from(await image.arrayBuffer()),
     (err) => {
       console.log("Failed to save image: ", err);

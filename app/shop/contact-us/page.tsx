@@ -70,7 +70,7 @@ export default function Page() {
 
       <section className="mt-0 flex justify-center">
         <img
-          src="/contact-us/ducks.png"
+          src="/images/contact-us/ducks.png"
           alt="Row of ducks"
           className="w-[800px] h-[350px] object-contain"
         />

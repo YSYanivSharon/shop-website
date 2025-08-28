@@ -50,7 +50,7 @@ export default function Page() {
               className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-md p-4 text-center hover:scale-105 transition-transform duration-300"
             >
               <Image
-                src={`/item-images/${item.id}.png`}
+                src={`/images/item-images/${item.id}.png`}
                 alt={item.name}
                 width={200}
                 height={200}
