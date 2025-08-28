@@ -5,9 +5,10 @@ import { Button } from "@headlessui/react";
 import { ShopItem } from "@/lib/types";
 import { getShopItem } from "@/lib/persist-module";
 import { getImageOfItem } from "@/app/components/item-images";
-import { TrashIcon } from "@heroicons/react/24/solid";
+import { ShoppingCartIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { tryRemoveItemFromWishlist } from "@/app/components/user-provider";
 import { UserContext } from "@/app/components/user-provider";
+import { addItemToCart } from "@/app/components/shopping-cart";
 
 export default function Page() {
   const user = useContext(UserContext);
@@ -38,6 +39,11 @@ export default function Page() {
     }
   }
 
+  async function onMoveToCart(index: number) {
+    addItemToCart(wishlist[index], 1);
+    await onRemoveItem(index);
+  }
+
   function getItemElement(item: ShopItem, index: number) {
     return (
       <div key={index}>
@@ -54,6 +60,15 @@ export default function Page() {
             }}
           >
             <TrashIcon className="size-6" />
+          </Button>
+          <Button
+            type="button"
+            onClick={() => {
+              onMoveToCart(index);
+            }}
+          >
+            <ShoppingCartIcon className="size-6" />
+            Move to cart
           </Button>
         </div>
       </div>
