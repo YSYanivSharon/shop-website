@@ -34,7 +34,7 @@ export enum ItemType {
 export type Purchase = {
   id: number;
   userId: number;
-  date: Date;
+  date: number;
   entries: PurchaseEntry[];
   shippingPrice: number;
   address: PaymentAddress;
@@ -68,7 +68,7 @@ export type CreditCardDetails = {
 
 export type UserEvent = {
   id: number;
-  date: Date;
+  date: number;
   userId: number;
   eventType: number;
   details: string[];

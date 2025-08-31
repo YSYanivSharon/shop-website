@@ -11,6 +11,7 @@ import {
   PurchaseEntry,
   Purchase,
   CreditCardDetails,
+  UserEvent,
 } from "@/lib/types";
 import { getVerifiedSession, storeVerifiedSession } from "@/lib/auth";
 
@@ -241,7 +242,7 @@ export async function pay(
 type DBPurchase = {
   id: number;
   userId: number;
-  date: Date;
+  date: number;
   entries: string;
   shippingPrice: number;
   address: string;
@@ -272,4 +273,25 @@ export async function getPurchaseHistory() {
   const purchaseHistory = dbPurchaseHistory.map(dbPurchaseToPurchase);
 
   return purchaseHistory;
+}
+
+export async function addUserEvent(eventType: number, details: string[]) {
+  const user = await getVerifiedSession();
+
+  // Don't log actions that are done by people who are not logged in
+  if (!user) return;
+
+  const addEvent = db.prepare(
+    "INSERT INTO UserEvents (date, userId, eventType, details) VALUES (?, ?, ?, ?)",
+  );
+
+  addEvent.run(Date.now(), user.id, eventType, JSON.stringify(details));
+}
+
+export async function getLatestUserEvents(count: number) {
+  const getEvents = db.prepare(
+    "SELECT * FROM UserEvents ORDER BY date DESC LIMIT (?)",
+  );
+
+  return getEvents.all(count) as UserEvent[];
 }
