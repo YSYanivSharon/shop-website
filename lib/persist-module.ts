@@ -60,9 +60,18 @@ export async function addUser(
   return null;
 }
 
-export async function getUser(email: string) {
+export async function getUserByEmail(email: string) {
   const getUser = db.prepare("SELECT * FROM Users WHERE email = ?");
   const dbUser = getUser.get(email) as DBUser;
+
+  if (dbUser) return DBUserToUser(dbUser);
+
+  return null;
+}
+
+export async function getUserById(id: number) {
+  const getUser = db.prepare("SELECT * FROM Users WHERE id = ?");
+  const dbUser = getUser.get(id) as DBUser;
 
   if (dbUser) return DBUserToUser(dbUser);
 
