@@ -2,7 +2,7 @@
 
 import crypto from "node:crypto";
 import { cookies } from "next/headers";
-import { getUser, addUser } from "@/lib/persist-module";
+import { getUserByEmail, addUser, addUserEvent } from "@/lib/persist-module";
 import { User, AuthLevel } from "@/lib/types";
 
 const userCookieName = "user";
@@ -32,8 +32,6 @@ export async function getAuthLevel(): Promise<AuthLevel> {
 }
 
 export async function signup(email: string, password: string) {
-  // TODO: Implement
-
   // TODO: replace with zod
   const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
   const passwordRegex = /.+/;
@@ -47,7 +45,7 @@ export async function signup(email: string, password: string) {
   }
 
   // Check if email is already used
-  if (await getUser(email)) {
+  if (await getUserByEmail(email)) {
     return "Email already used";
   }
 
@@ -61,14 +59,17 @@ export async function signup(email: string, password: string) {
 
   await storeVerifiedSession(user);
 
+  await addUserEvent(1, []);
+
   return user;
 }
 
 export async function login(email: string, password: string) {
-  const user = await getUser(email);
+  const user = await getUserByEmail(email);
 
   if (user && user.password == (await getScrypt(password))) {
     await storeVerifiedSession(user);
+    await addUserEvent(0, []);
     return user;
   }
 
@@ -76,6 +77,7 @@ export async function login(email: string, password: string) {
 }
 
 export async function logout() {
+  await addUserEvent(2, []);
   const cookieStore = await cookies();
   cookieStore.delete(userCookieName);
   cookieStore.delete(certCookieName);
