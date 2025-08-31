@@ -65,3 +65,11 @@ export type CreditCardDetails = {
   name: string;
   code: number;
 };
+
+export type UserEvent = {
+  id: number;
+  date: Date;
+  userId: number;
+  eventType: number;
+  details: string[];
+};
