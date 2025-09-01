@@ -7,6 +7,7 @@ import {
   PropsWithChildren,
   Dispatch,
   SetStateAction,
+  useEffect,
 } from "react";
 import * as Server from "@/lib/auth";
 import {
@@ -20,40 +21,29 @@ import {
 } from "@/lib/persist-module";
 
 export const StorageKey = "user";
-const isServer = typeof window === "undefined";
 export const UserContext = createContext<User | null>(null);
-let setState: Dispatch<SetStateAction<User | null>>;
+let setProvidedUser: Dispatch<SetStateAction<User | null>>;
+let reloadUser: () => Promise<void>;
 
 export function UserProvider({ children }: PropsWithChildren<unknown>) {
-  const [currUser, setCurrUser] = useState(() => loadCurrUser());
+  const [currUser, setCurrUser] = useState<User | null>(null);
+  const [mounted, setMounted] = useState(false);
 
-  setState = setCurrUser;
+  useEffect(() => {
+    if (!mounted) {
+      loadUser();
+      setMounted(true);
+    }
+  }, []);
+
+  const loadUser = async () => {
+    setCurrUser(await Server.getVerifiedSession());
+  };
+
+  setProvidedUser = setCurrUser;
+  reloadUser = loadUser;
 
   return <UserContext value={currUser}>{children}</UserContext>;
-}
-
-/*
- * Loads the current user from the persistent storage if there is one
- */
-function loadCurrUser() {
-  if (isServer) return null;
-
-  try {
-    const userJson = localStorage.getItem(StorageKey);
-
-    if (!userJson) return null;
-
-    return (JSON.parse(userJson) as User) || null;
-  } catch (e) {
-    // Unsupported
-    return null;
-  }
-}
-
-export function setCurrUser(user: User | null) {
-  localStorage.setItem(StorageKey, JSON.stringify(user));
-
-  setState(user);
 }
 
 export async function signup(email: string, password: string) {
@@ -61,7 +51,7 @@ export async function signup(email: string, password: string) {
 
   if (typeof result === "string") return result;
 
-  setCurrUser(result);
+  setProvidedUser(result);
 
   return result;
 }
@@ -74,33 +64,13 @@ export async function login(email: string, password: string) {
     user = await Server.login(email, password);
   }
 
-  setCurrUser(user);
+  setProvidedUser(user);
   return user;
 }
 
 export async function logout() {
   await Server.logout();
-  setCurrUser(null);
-}
-
-function addEntryToCart(entry: PurchaseEntry) {
-  let newUserState = loadCurrUser();
-
-  if (!newUserState) return false;
-
-  const cartEntry = newUserState.cart.find((cartEntry) => {
-    return JSON.stringify(cartEntry.item) == JSON.stringify(entry.item);
-  });
-
-  if (cartEntry) {
-    cartEntry.count += entry.count;
-  } else {
-    newUserState.cart.push(entry);
-  }
-
-  setCurrUser(newUserState);
-
-  return true;
+  setProvidedUser(null);
 }
 
 export async function tryAddItemToCart(item: ShopItem, count: number) {
@@ -108,7 +78,7 @@ export async function tryAddItemToCart(item: ShopItem, count: number) {
 
   if (!succeeded) return false;
 
-  addEntryToCart({ item: item, count: count });
+  reloadUser();
 
   return true;
 }
@@ -126,10 +96,7 @@ export async function tryAddCustomDuckToCart(
 
   if (!succeeded) return false;
 
-  addEntryToCart({
-    item: { id: 0, color: color, head: head, body: body },
-    count: 1,
-  });
+  reloadUser();
 
   return true;
 }
@@ -142,13 +109,7 @@ export async function trySetEntryCountInCart(
 
   if (!succeeded) return false;
 
-  let newUserState = loadCurrUser();
-
-  if (!newUserState) return false;
-
-  newUserState.cart[entryIndex].count = count;
-
-  setCurrUser(newUserState);
+  reloadUser();
 
   return true;
 }
@@ -158,15 +119,7 @@ export async function tryRemoveEntryFromCart(entryIndex: number) {
 
   if (!succeeded) return false;
 
-  let newUserState = loadCurrUser();
-
-  if (!newUserState) return false;
-
-  newUserState.cart = newUserState.cart.filter(
-    (_, index) => index != entryIndex,
-  );
-
-  setCurrUser(newUserState);
+  reloadUser();
 
   return true;
 }
@@ -176,14 +129,7 @@ export async function tryPay(address: PaymentAddress, card: CreditCardDetails) {
 
   if (!succeeded) return false;
 
-  // Clear the cart client-side
-  let newUserState = loadCurrUser();
-
-  if (!newUserState) return false;
-
-  newUserState.cart = [];
-
-  setCurrUser(newUserState);
+  reloadUser();
 
   return true;
 }
@@ -193,13 +139,7 @@ export async function tryAddItemToWishlist(itemId: number) {
 
   if (!succeeded) return false;
 
-  let newUserState = loadCurrUser();
-
-  if (!newUserState) return false;
-
-  newUserState.wishlist.push(itemId);
-
-  setCurrUser(newUserState);
+  reloadUser();
 
   return true;
 }
@@ -209,12 +149,7 @@ export async function tryRemoveItemFromWishlist(itemId: number) {
 
   if (!succeeded) return false;
 
-  let newUserState = loadCurrUser();
-
-  if (!newUserState) return false;
-
-  newUserState.wishlist = newUserState.wishlist.filter((id) => id != itemId);
-  setCurrUser(newUserState);
+  reloadUser();
 
   return true;
 }
