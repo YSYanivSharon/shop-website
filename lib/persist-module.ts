@@ -127,19 +127,44 @@ async function tryAddEntryToCart(entry: PurchaseEntry) {
   return await trySetCart(cart);
 }
 
-export async function tryAddItemToCart(item: ShopItem, count: number) {
-  return await tryAddEntryToCart({ item: item, count: count });
+export async function tryAddItemToCart(itemId: number, count: number) {
+  const item = await getShopItem(itemId);
+
+  if (!item) return false;
+
+  const success = await tryAddEntryToCart({ item: item, count: count });
+
+  if (!success) return false;
+
+  addUserEvent(3, [count.toString(), item.name]);
+
+  return true;
 }
 
 export async function tryAddCustomDuckToCart(
-  color: ShopItem,
-  head: ShopItem,
-  body: ShopItem,
+  colorId: number,
+  headId: number,
+  bodyId: number,
 ) {
-  return await tryAddEntryToCart({
+  const color = await getShopItem(colorId);
+  const head = await getShopItem(headId);
+  const body = await getShopItem(bodyId);
+
+  if (!color || !head || !body) return false;
+
+  const success = await tryAddEntryToCart({
     item: { id: 0, color: color, head: head, body: body },
     count: 1,
   });
+
+  if (!success) return false;
+
+  addUserEvent(3, [
+    "1",
+    `custom duck with: { color: ${color.name}, head: ${head.name}, body: ${body.name}`,
+  ]);
+
+  return true;
 }
 
 export async function trySetEntryCountInCart(
@@ -170,18 +195,16 @@ export async function tryClearCart() {
 
 export async function tryGetWishlist() {
   const user = await getVerifiedSession();
-  if (!user) {
-    return null;
-  }
+
+  if (!user) return null;
 
   return user.wishlist;
 }
 
 async function trySetWishlist(wishlist: number[]) {
   const user = await getVerifiedSession();
-  if (!user) {
-    return false;
-  }
+
+  if (!user) return false;
 
   const setWishlist = db.prepare("UPDATE Users SET wishlist = ? WHERE id = ?");
   const runInfo = setWishlist.run(JSON.stringify(wishlist), user.id);
