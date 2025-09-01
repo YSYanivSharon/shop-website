@@ -73,14 +73,18 @@ export default function ShopHeader() {
           <div className="flex justify-end">
             <div className="w-px border" />
 
-            <Link
-              href="/shop/cart"
-              className="flex font-semibold py-1 px-6 transition"
-            >
-              <ShoppingCartIcon className="size-6" />
-              Cart
-            </Link>
-            <div className="w-px border" />
+            {email && (
+              <>
+                <Link
+                  href="/shop/cart"
+                  className="flex font-semibold py-1 px-6 transition"
+                >
+                  <ShoppingCartIcon className="size-6" />
+                  Cart
+                </Link>
+                <div className="w-px border" />
+              </>
+            )}
 
             {!email && (
               <Link

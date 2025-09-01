@@ -26,11 +26,13 @@ async function openDb() {
   return sqlite("./database.sqlite3", options);
 }
 
+// User
 type DBUser = {
   id: number;
   email: string;
   password: string;
   authLevel: AuthLevel;
+  cart: string;
   wishlist: string;
 };
 
@@ -40,11 +42,11 @@ function DBUserToUser(dbUser: DBUser): User {
     email: dbUser.email,
     password: dbUser.password,
     authLevel: dbUser.authLevel,
+    cart: JSON.parse(dbUser.cart),
     wishlist: JSON.parse(dbUser.wishlist),
   };
 }
 
-// Authentication
 export async function addUser(
   email: string,
   hashedPassword: string,
@@ -77,6 +79,161 @@ export async function getUserById(id: number) {
   if (dbUser) return DBUserToUser(dbUser);
 
   return null;
+}
+
+export async function tryGetCart() {
+  const user = await getVerifiedSession();
+  if (!user) {
+    return null;
+  }
+
+  return user.cart;
+}
+
+async function trySetCart(cart: PurchaseEntry[]) {
+  const user = await getVerifiedSession();
+  if (!user) {
+    return false;
+  }
+
+  const setCart = db.prepare("UPDATE Users SET cart = ? WHERE id = ?");
+  const runInfo = setCart.run(JSON.stringify(cart), user.id);
+
+  if (runInfo.changes > 0) {
+    user.cart = cart;
+    await storeVerifiedSession(user);
+
+    return true;
+  }
+
+  return false;
+}
+
+async function tryAddEntryToCart(entry: PurchaseEntry) {
+  let cart = await tryGetCart();
+
+  if (!cart) return false;
+
+  const cartEntry = cart.find((cartEntry) => {
+    return JSON.stringify(cartEntry.item) == JSON.stringify(entry.item);
+  });
+
+  if (cartEntry) {
+    cartEntry.count += entry.count;
+  } else {
+    cart.push(entry);
+  }
+
+  return await trySetCart(cart);
+}
+
+export async function tryAddItemToCart(item: ShopItem, count: number) {
+  return await tryAddEntryToCart({ item: item, count: count });
+}
+
+export async function tryAddCustomDuckToCart(
+  color: ShopItem,
+  head: ShopItem,
+  body: ShopItem,
+) {
+  return await tryAddEntryToCart({
+    item: { id: 0, color: color, head: head, body: body },
+    count: 1,
+  });
+}
+
+export async function trySetEntryCountInCart(
+  entryIndex: number,
+  count: number,
+) {
+  let cart = await tryGetCart();
+
+  if (!cart) return false;
+
+  cart[entryIndex].count = count;
+
+  return await trySetCart(cart);
+}
+
+export async function tryRemoveEntryFromCart(entryIndex: number) {
+  let cart = await tryGetCart();
+
+  if (!cart) return false;
+
+  cart = cart.filter((_, index) => index != entryIndex);
+  return await trySetCart(cart);
+}
+
+export async function tryClearCart() {
+  return await trySetCart([]);
+}
+
+export async function tryGetWishlist() {
+  const user = await getVerifiedSession();
+  if (!user) {
+    return null;
+  }
+
+  return user.wishlist;
+}
+
+async function trySetWishlist(wishlist: number[]) {
+  const user = await getVerifiedSession();
+  if (!user) {
+    return false;
+  }
+
+  const setWishlist = db.prepare("UPDATE Users SET wishlist = ? WHERE id = ?");
+  const runInfo = setWishlist.run(JSON.stringify(wishlist), user.id);
+
+  if (runInfo.changes > 0) {
+    user.wishlist = wishlist;
+    await storeVerifiedSession(user);
+
+    return true;
+  }
+
+  return false;
+}
+
+export async function tryAddItemToWishlist(itemId: number) {
+  const wishlist = await tryGetWishlist();
+
+  if (!wishlist) return false;
+
+  if (wishlist.includes(itemId)) return false;
+
+  const item = await getShopItem(itemId);
+  if (!item) return false;
+
+  wishlist.push(itemId);
+
+  const success = await trySetWishlist(wishlist);
+
+  if (success) {
+    await addUserEvent(6, [item.name]);
+  }
+
+  return success;
+}
+
+export async function tryRemoveItemFromWishlist(itemId: number) {
+  let wishlist = await tryGetWishlist();
+
+  if (!wishlist) return false;
+
+  const newWishlist = wishlist.filter((id) => id != itemId);
+
+  if (newWishlist.length == wishlist.length) return false;
+
+  const success = await trySetWishlist(newWishlist);
+
+  if (success) {
+    const item = await getShopItem(itemId);
+    await addUserEvent(7, [item.name]);
+  }
+
+  return success;
 }
 
 // Shop items
@@ -131,84 +288,12 @@ export async function addShopItem(
   return item;
 }
 
-export async function getWishlist() {
-  const user = await getVerifiedSession();
-  if (!user) {
-    return [];
-  }
-
-  return user.wishlist;
-}
-
-async function trySetWishlist(wishlist: number[]) {
-  const user = await getVerifiedSession();
-  if (!user) {
-    return false;
-  }
-
-  const setWishlist = db.prepare("UPDATE Users SET wishlist = ? WHERE id = ?");
-  const runInfo = setWishlist.run(JSON.stringify(wishlist), user.id);
-
-  if (runInfo.changes > 0) {
-    user.wishlist = wishlist;
-    await storeVerifiedSession(user);
-
-    return true;
-  }
-
-  return false;
-}
-
-export async function tryAddItemToWishlist(itemId: number) {
-  const wishlist = await getWishlist();
-
-  if (!wishlist) return false;
-
-  if (wishlist.includes(itemId)) return false;
-
-  const item = await getShopItem(itemId);
-  if (!item) return false;
-
-  wishlist.push(itemId);
-
-  const success = await trySetWishlist(wishlist);
-
-  if (success) {
-    await addUserEvent(6, [item.name]);
-  }
-
-  return success;
-}
-
-export async function tryRemoveItemFromWishlist(itemId: number) {
-  let wishlist = await getWishlist();
-
-  if (!wishlist) return false;
-
-  const newWishlist = wishlist.filter((id) => id != itemId);
-
-  if (newWishlist.length == wishlist.length) return false;
-
-  const success = await trySetWishlist(newWishlist);
-
-  if (success) {
-    const item = await getShopItem(itemId);
-    await addUserEvent(7, [item.name]);
-  }
-
-  return success;
-}
-
 export async function getShippingPrice(address: PaymentAddress) {
   // Pretend that there is actual logic here
   return 10;
 }
 
-export async function pay(
-  cart: PurchaseEntry[],
-  address: PaymentAddress,
-  card: CreditCardDetails,
-) {
+export async function tryPay(address: PaymentAddress, card: CreditCardDetails) {
   const user = await getVerifiedSession();
 
   if (!user) return false;
@@ -217,7 +302,7 @@ export async function pay(
   var price = 0;
   var actualCart = [];
 
-  for (var entry of cart) {
+  for (var entry of user.cart) {
     var item = await getShopItem(entry.item.id);
     if (item) {
       price += item.price;
@@ -248,7 +333,13 @@ export async function pay(
     JSON.stringify(address),
   );
 
-  return results.changes > 0;
+  const success = results.changes > 0;
+
+  if (success) {
+    await tryClearCart();
+  }
+
+  return success;
 }
 
 type DBPurchase = {

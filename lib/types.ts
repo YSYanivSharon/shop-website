@@ -13,6 +13,7 @@ export type User = {
   email: string;
   password: string;
   authLevel: AuthLevel;
+  cart: PurchaseEntry[];
   wishlist: number[];
 };
 

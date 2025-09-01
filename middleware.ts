@@ -17,7 +17,6 @@ const publicRoutes = [
   /^\/shop\/catalog$/i,
   /^\/shop\/build-a-duck$/i,
   /^\/shop\/contact-us$/i,
-  /^\/shop\/cart$/i,
   /^\/shop\/item\/\d+$/i,
   /^\/shop\/user\/login$/i,
   /^\/shop\/user\/signup$/i,

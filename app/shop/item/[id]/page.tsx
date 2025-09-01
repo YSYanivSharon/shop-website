@@ -3,6 +3,7 @@
 import { use, useEffect, useState, useContext, ChangeEvent } from "react";
 import { getShopItem } from "@/lib/persist-module";
 import {
+  tryAddItemToCart,
   tryAddItemToWishlist,
   tryRemoveItemFromWishlist,
 } from "@/app/components/user-provider";
@@ -12,7 +13,6 @@ import { UserContext } from "@/app/components/user-provider";
 import { HeartIcon as SolidHeartIcon } from "@heroicons/react/24/solid";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
-import { addItemToCart } from "@/app/components/shopping-cart";
 
 export default function Page({ params }: { params: Promise<{ id: number }> }) {
   const [mounted, setMounted] = useState(false);
@@ -54,11 +54,14 @@ export default function Page({ params }: { params: Promise<{ id: number }> }) {
     wishlisted = mounted && wishlist.includes(id);
   }
 
-  function handleAddToCart() {
-    if (item) {
-      addItemToCart(item, count);
+  async function handleAddToCart() {
+    if (!item) return;
+
+    if (await tryAddItemToCart(item, count)) {
       setMessage(`"${item.name}" has been added to your cart!`);
       setTimeout(() => setMessage(null), 2500);
+    } else {
+      // TODO: Handle failure of adding to cart
     }
   }
 

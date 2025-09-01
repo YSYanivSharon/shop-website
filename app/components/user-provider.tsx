@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "@/lib/types";
+import { User, PurchaseEntry, ShopItem, CreditCardDetails } from "@/lib/types";
 import {
   createContext,
   useState,
@@ -10,6 +10,11 @@ import {
 } from "react";
 import * as Server from "@/lib/auth";
 import {
+  tryAddItemToCart as tryAddItemToServerCart,
+  tryAddCustomDuckToCart as tryAddCustomDuckToServerCart,
+  trySetEntryCountInCart as trySetEntryCountInServerCart,
+  tryRemoveEntryFromCart as tryRemoveEntryFromServerCart,
+  tryPay as tryServerPay,
   tryAddItemToWishlist as tryAddItemToServerWishlist,
   tryRemoveItemFromWishlist as tryRemoveItemFromServerWishlist,
 } from "@/lib/persist-module";
@@ -78,36 +83,134 @@ export async function logout() {
   setCurrUser(null);
 }
 
+function addEntryToCart(entry: PurchaseEntry) {
+  let newUserState = loadCurrUser();
+
+  if (!newUserState) return false;
+
+  const cartEntry = newUserState.cart.find((cartEntry) => {
+    return JSON.stringify(cartEntry.item) == JSON.stringify(entry.item);
+  });
+
+  if (cartEntry) {
+    cartEntry.count += entry.count;
+  } else {
+    newUserState.cart.push(entry);
+  }
+
+  setCurrUser(newUserState);
+
+  return true;
+}
+
+export async function tryAddItemToCart(item: ShopItem, count: number) {
+  const succeeded = await tryAddItemToServerCart(item, count);
+
+  if (!succeeded) return false;
+
+  addEntryToCart({ item: item, count: count });
+
+  return true;
+}
+
+export async function tryAddCustomDuckToCart(
+  color: ShopItem,
+  head: ShopItem,
+  body: ShopItem,
+) {
+  const succeeded = await tryAddCustomDuckToServerCart(color, head, body);
+
+  if (!succeeded) return false;
+
+  addEntryToCart({
+    item: { id: 0, color: color, head: head, body: body },
+    count: 1,
+  });
+
+  return true;
+}
+
+export async function trySetEntryCountInCart(
+  entryIndex: number,
+  count: number,
+) {
+  const succeeded = await trySetEntryCountInServerCart(entryIndex, count);
+
+  if (!succeeded) return false;
+
+  let newUserState = loadCurrUser();
+
+  if (!newUserState) return false;
+
+  newUserState.cart[entryIndex].count = count;
+
+  setCurrUser(newUserState);
+
+  return true;
+}
+
+export async function tryRemoveEntryFromCart(entryIndex: number) {
+  const succeeded = await tryRemoveEntryFromServerCart(entryIndex);
+
+  if (!succeeded) return false;
+
+  let newUserState = loadCurrUser();
+
+  if (!newUserState) return false;
+
+  newUserState.cart = newUserState.cart.filter(
+    (_, index) => index != entryIndex,
+  );
+
+  setCurrUser(newUserState);
+
+  return true;
+}
+
+export async function tryPay(address: PaymentAddress, card: CreditCardDetails) {
+  const succeeded = await tryServerPay(address, card);
+
+  if (!succeeded) return false;
+
+  // Clear the cart client-side
+  let newUserState = loadCurrUser();
+
+  if (!newUserState) return false;
+
+  newUserState.cart = [];
+
+  setCurrUser(newUserState);
+
+  return true;
+}
+
 export async function tryAddItemToWishlist(itemId: number) {
   const succeeded = await tryAddItemToServerWishlist(itemId);
 
-  if (succeeded) {
-    let newUserState = loadCurrUser();
-    if (newUserState) {
-      newUserState.wishlist.push(itemId);
-      setCurrUser(newUserState);
+  if (!succeeded) return false;
 
-      return true;
-    }
-  }
+  let newUserState = loadCurrUser();
 
-  return false;
+  if (!newUserState) return false;
+
+  newUserState.wishlist.push(itemId);
+
+  setCurrUser(newUserState);
+
+  return true;
 }
 
 export async function tryRemoveItemFromWishlist(itemId: number) {
   const succeeded = await tryRemoveItemFromServerWishlist(itemId);
 
-  if (succeeded) {
-    let newUserState = loadCurrUser();
-    if (newUserState) {
-      newUserState.wishlist = newUserState.wishlist.filter(
-        (id) => id != itemId,
-      );
-      setCurrUser(newUserState);
+  if (!succeeded) return false;
 
-      return true;
-    }
-  }
+  let newUserState = loadCurrUser();
 
-  return false;
+  if (!newUserState) return false;
+
+  newUserState.wishlist = newUserState.wishlist.filter((id) => id != itemId);
+  setCurrUser(newUserState);
+
+  return true;
 }

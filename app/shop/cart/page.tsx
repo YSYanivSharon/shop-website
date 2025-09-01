@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Button, Input } from "@headlessui/react";
 import Link from "next/link";
 import { PurchaseEntry, ShopItem, CustomDuck } from "@/lib/types";
 import {
-  getCart,
-  removeEntryFromCart,
-  setEntryCountInCart,
-} from "@/app/components/shopping-cart";
+  UserContext,
+  tryRemoveEntryFromCart,
+  trySetEntryCountInCart,
+} from "@/app/components/user-provider";
 import { getShopItem } from "@/lib/persist-module";
 import {
   getImageOfCustomDuck,
@@ -17,24 +17,22 @@ import {
 import { TrashIcon, CreditCardIcon } from "@heroicons/react/24/solid";
 
 export default function Page() {
-  const [cart, setCart] = useState<PurchaseEntry[]>([]);
   const [customDuckPrice, setCustomDuckPrice] = useState<number>(0);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const loadCart = async function () {
-      setCart(getCart());
-    };
     const loadCustomDuckPrice = async function () {
       setCustomDuckPrice((await getShopItem(0)).price);
     };
 
     if (!mounted) {
-      loadCart();
       loadCustomDuckPrice();
       setMounted(true);
     }
   });
+
+  const user = useContext(UserContext);
+  const cart = mounted ? (user?.cart ?? []) : [];
 
   function getEntryElement(entry: PurchaseEntry, index: number) {
     let innerElement;
@@ -56,7 +54,7 @@ export default function Page() {
           <Button
             type="button"
             onClick={() => {
-              setCart(removeEntryFromCart(index));
+              tryRemoveEntryFromCart(index);
             }}
           >
             <TrashIcon className="size-6" />
@@ -68,7 +66,7 @@ export default function Page() {
               const count = Number.parseInt(e.target.value);
 
               if (count >= 1) {
-                setCart(setEntryCountInCart(index, count));
+                trySetEntryCountInCart(index, count);
               }
             }}
           />
