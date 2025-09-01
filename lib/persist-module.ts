@@ -162,29 +162,41 @@ async function trySetWishlist(wishlist: number[]) {
 export async function tryAddItemToWishlist(itemId: number) {
   const wishlist = await getWishlist();
 
-  if (!wishlist) {
-    return false;
+  if (!wishlist) return false;
+
+  if (wishlist.includes(itemId)) return false;
+
+  const item = await getShopItem(itemId);
+  if (!item) return false;
+
+  wishlist.push(itemId);
+
+  const success = await trySetWishlist(wishlist);
+
+  if (success) {
+    await addUserEvent(6, [item.name]);
   }
 
-  if (!wishlist.includes(itemId)) {
-    wishlist.push(itemId);
-  }
-
-  return await trySetWishlist(wishlist);
+  return success;
 }
 
 export async function tryRemoveItemFromWishlist(itemId: number) {
   let wishlist = await getWishlist();
 
-  if (!wishlist) {
-    return false;
-  }
+  if (!wishlist) return false;
 
   const newWishlist = wishlist.filter((id) => id != itemId);
 
   if (newWishlist.length == wishlist.length) return false;
 
-  return await trySetWishlist(newWishlist);
+  const success = await trySetWishlist(newWishlist);
+
+  if (success) {
+    const item = await getShopItem(itemId);
+    await addUserEvent(7, [item.name]);
+  }
+
+  return success;
 }
 
 export async function getShippingPrice(address: PaymentAddress) {
@@ -275,6 +287,24 @@ export async function getPurchaseHistory() {
   return purchaseHistory;
 }
 
+type DBUserEvent = {
+  id: number;
+  date: number;
+  userId: number;
+  eventType: number;
+  details: string;
+};
+
+function dbUserEventToUserEvent(dbUserEvent: DBUserEvent) {
+  return {
+    id: dbUserEvent.id,
+    date: dbUserEvent.date,
+    userId: dbUserEvent.userId,
+    eventType: dbUserEvent.eventType,
+    details: JSON.parse(dbUserEvent.details),
+  } as UserEvent;
+}
+
 export async function addUserEvent(eventType: number, details: string[]) {
   const user = await getVerifiedSession();
 
@@ -293,5 +323,7 @@ export async function getLatestUserEvents(count: number) {
     "SELECT * FROM UserEvents ORDER BY date DESC LIMIT (?)",
   );
 
-  return getEvents.all(count) as UserEvent[];
+  const dbUserEvents = getEvents.all(count) as DBUserEvent[];
+
+  return dbUserEvents.map(dbUserEventToUserEvent);
 }
