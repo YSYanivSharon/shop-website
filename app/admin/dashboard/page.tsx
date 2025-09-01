@@ -15,9 +15,9 @@ const eventTemplates = [
   "removed {0} from their wishlist",
 ];
 
-function formatString(template: string, ...args: any[]): string {
+function formatString(template: string, details: string[]): string {
   return template.replace(/{(\d+)}/g, (match, index) => {
-    return typeof args[index] !== "undefined" ? args[index] : match;
+    return typeof details[index] !== "undefined" ? details[index] : match;
   });
 }
 
