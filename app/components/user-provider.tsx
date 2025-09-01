@@ -104,7 +104,7 @@ function addEntryToCart(entry: PurchaseEntry) {
 }
 
 export async function tryAddItemToCart(item: ShopItem, count: number) {
-  const succeeded = await tryAddItemToServerCart(item, count);
+  const succeeded = await tryAddItemToServerCart(item.id, count);
 
   if (!succeeded) return false;
 
@@ -118,7 +118,11 @@ export async function tryAddCustomDuckToCart(
   head: ShopItem,
   body: ShopItem,
 ) {
-  const succeeded = await tryAddCustomDuckToServerCart(color, head, body);
+  const succeeded = await tryAddCustomDuckToServerCart(
+    color.id,
+    head.id,
+    body.id,
+  );
 
   if (!succeeded) return false;
 
