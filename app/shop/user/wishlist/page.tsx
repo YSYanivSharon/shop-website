@@ -7,8 +7,7 @@ import { getShopItem } from "@/lib/persist-module";
 import { getImageOfItem } from "@/app/components/item-images";
 import { ShoppingCartIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { tryRemoveItemFromWishlist } from "@/app/components/user-provider";
-import { UserContext } from "@/app/components/user-provider";
-import { addItemToCart } from "@/app/components/shopping-cart";
+import { UserContext, tryAddItemToCart } from "@/app/components/user-provider";
 
 export default function Page() {
   const user = useContext(UserContext);
@@ -40,8 +39,11 @@ export default function Page() {
   }
 
   async function onMoveToCart(index: number) {
-    addItemToCart(wishlist[index], 1);
-    await onRemoveItem(index);
+    if (await tryAddItemToCart(wishlist[index], 1)) {
+      await onRemoveItem(index);
+    } else {
+      // TODO: Handle failure
+    }
   }
 
   function getItemElement(item: ShopItem, index: number) {

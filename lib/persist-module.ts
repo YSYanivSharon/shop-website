@@ -161,7 +161,7 @@ export async function tryAddCustomDuckToCart(
 
   addUserEvent(3, [
     "1",
-    `custom duck with: { color: ${color.name}, head: ${head.name}, body: ${body.name}`,
+    `custom duck with: { color: ${color.name}, head: ${head.name}, body: ${body.name} }`,
   ]);
 
   return true;
