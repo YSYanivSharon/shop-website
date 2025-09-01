@@ -7,8 +7,7 @@ import { getDuckParts } from "@/lib/persist-module";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { Button } from "@headlessui/react";
-import { addCustomDuckToCart } from "@/app/components/shopping-cart";
-import { UserContext } from "@/app/components/user-provider";
+import { tryAddCustomDuckToCart } from "@/app/components/user-provider";
 
 export default function Page() {
   const [partsCatalog, setPartsCatalog] =
@@ -49,15 +48,20 @@ export default function Page() {
     setter(value - 1 < 0 ? valueCount - 1 : value - 1);
   }
 
-  function handleAddToCart() {
+  async function handleAddToCart() {
     if (!partsCatalog) return;
-    addCustomDuckToCart(
-      partsCatalog.colors[pickedColor],
-      partsCatalog.heads[pickedHead],
-      partsCatalog.bodies[pickedBody],
-    );
-    setMessage("Your custom duck was added to the cart!");
-    setTimeout(() => setMessage(null), 3000);
+    if (
+      await tryAddCustomDuckToCart(
+        partsCatalog.colors[pickedColor],
+        partsCatalog.heads[pickedHead],
+        partsCatalog.bodies[pickedBody],
+      )
+    ) {
+      setMessage("Your custom duck was added to the cart!");
+      setTimeout(() => setMessage(null), 3000);
+    } else {
+      // TODO: Handle failure to add to the cart
+    }
   }
 
   return (
@@ -183,4 +187,3 @@ export default function Page() {
     </div>
   );
 }
-

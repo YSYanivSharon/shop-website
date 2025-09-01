@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Button, Input } from "@headlessui/react";
 import {
   PurchaseEntry,
@@ -8,8 +8,8 @@ import {
   CustomDuck,
   CreditCardDetails,
 } from "@/lib/types";
-import { clearCart, getCart } from "@/app/components/shopping-cart";
-import { getShippingPrice, getShopItem, pay } from "@/lib/persist-module";
+import { getShippingPrice, getShopItem } from "@/lib/persist-module";
+import { UserContext, tryPay } from "@/app/components/user-provider";
 import {
   getImageOfCustomDuck,
   getImageOfItem,
@@ -19,7 +19,6 @@ import { useRouter } from "next/navigation";
 
 export default function Page() {
   const router = useRouter();
-  const [cart, setCart] = useState<PurchaseEntry[]>([]);
   const [customDuckPrice, setCustomDuckPrice] = useState<number>(0);
   const [mounted, setMounted] = useState(false);
   const [address, setAddress] = useState<PaymentAddress | null>(null);
@@ -27,19 +26,18 @@ export default function Page() {
     useState<CreditCardDetails | null>(null);
 
   useEffect(() => {
-    const loadCart = async function () {
-      setCart(getCart());
-    };
     const loadCustomDuckPrice = async function () {
       setCustomDuckPrice((await getShopItem(0)).price);
     };
 
     if (!mounted) {
-      loadCart();
       loadCustomDuckPrice();
       setMounted(true);
     }
   });
+
+  const user = useContext(UserContext);
+  const cart = mounted ? (user?.cart ?? []) : [];
 
   function getEntryElement(entry: PurchaseEntry, index: number) {
     let innerElement;
@@ -90,10 +88,9 @@ export default function Page() {
       return;
     }
 
-    const successful = await pay(cart, address, creditCardDetails);
+    const successful = await tryPay(address, creditCardDetails);
 
     if (successful) {
-      clearCart();
       router.replace("/shop/user/my-items");
     } else {
       // TODO: handle failures
