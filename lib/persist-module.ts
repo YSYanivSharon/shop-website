@@ -13,7 +13,7 @@ import {
   CreditCardDetails,
   UserEvent,
 } from "@/lib/types";
-import { getVerifiedSession, storeVerifiedSession } from "@/lib/auth";
+import { getVerifiedSession, updateVerifiedSession } from "@/lib/auth";
 
 const db = await openDb();
 
@@ -101,7 +101,7 @@ async function trySetCart(cart: PurchaseEntry[]) {
 
   if (runInfo.changes > 0) {
     user.cart = cart;
-    await storeVerifiedSession(user);
+    await updateVerifiedSession(user);
 
     return true;
   }
@@ -211,7 +211,7 @@ async function trySetWishlist(wishlist: number[]) {
 
   if (runInfo.changes > 0) {
     user.wishlist = wishlist;
-    await storeVerifiedSession(user);
+    await updateVerifiedSession(user);
 
     return true;
   }

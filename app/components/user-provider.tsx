@@ -56,12 +56,16 @@ export async function signup(email: string, password: string) {
   return result;
 }
 
-export async function login(email: string, password: string) {
+export async function login(
+  email: string,
+  password: string,
+  longTerm: boolean,
+) {
   // First, check if there is a mismatch between the local storage and cookies
   let user = await Server.getVerifiedSession();
 
   if (!user) {
-    user = await Server.login(email, password);
+    user = await Server.login(email, password, longTerm);
   }
 
   setProvidedUser(user);
