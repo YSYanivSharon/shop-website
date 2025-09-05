@@ -10,10 +10,11 @@ import {
   CustomDuckPartsCatalog,
   PurchaseEntry,
   Purchase,
+  Address,
   CreditCardDetails,
   UserEvent,
 } from "@/lib/types";
-import { getVerifiedSession, storeVerifiedSession } from "@/lib/auth";
+import { getVerifiedSession, updateVerifiedSession } from "@/lib/auth";
 
 const db = await openDb();
 
@@ -101,7 +102,7 @@ async function trySetCart(cart: PurchaseEntry[]) {
 
   if (runInfo.changes > 0) {
     user.cart = cart;
-    await storeVerifiedSession(user);
+    await updateVerifiedSession(user);
 
     return true;
   }
@@ -211,7 +212,7 @@ async function trySetWishlist(wishlist: number[]) {
 
   if (runInfo.changes > 0) {
     user.wishlist = wishlist;
-    await storeVerifiedSession(user);
+    await updateVerifiedSession(user);
 
     return true;
   }
@@ -311,12 +312,12 @@ export async function addShopItem(
   return item;
 }
 
-export async function getShippingPrice(address: PaymentAddress) {
+export async function getShippingPrice(address: Address) {
   // Pretend that there is actual logic here
   return 10;
 }
 
-export async function tryPay(address: PaymentAddress, card: CreditCardDetails) {
+export async function tryPay(address: Address, card: CreditCardDetails) {
   const user = await getVerifiedSession();
 
   if (!user) return false;
@@ -388,7 +389,7 @@ function dbPurchaseToPurchase(dbPurchase: DBPurchase) {
 export async function getPurchaseHistory() {
   const user = await getVerifiedSession();
 
-  if (!user) return false;
+  if (!user) return null;
 
   const getPurchasesOfUser = db.prepare(
     "SELECT * FROM Purchases WHERE userId = ?",
@@ -399,6 +400,22 @@ export async function getPurchaseHistory() {
   const purchaseHistory = dbPurchaseHistory.map(dbPurchaseToPurchase);
 
   return purchaseHistory;
+}
+
+export async function getLastPurchase() {
+  const user = await getVerifiedSession();
+
+  if (!user) return null;
+
+  const getLastPurchaseOfUser = db.prepare(
+    "SELECT * FROM Purchases WHERE userId = ? ORDER BY date DESC LIMIT 1",
+  );
+
+  const dbLastPurchase = getLastPurchaseOfUser.get(user.id) as DBPurchase;
+
+  const purchase = dbPurchaseToPurchase(dbLastPurchase);
+
+  return purchase;
 }
 
 type DBUserEvent = {

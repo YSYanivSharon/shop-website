@@ -1,40 +1,57 @@
 "use client";
 
-import { getPurchaseHistory } from "@/lib/persist-module";
+import { useState, useEffect, useContext } from "react";
+import { Button, Input } from "@headlessui/react";
+import Link from "next/link";
 import { Purchase, PurchaseEntry, ShopItem, CustomDuck } from "@/lib/types";
-import { useState, useEffect } from "react";
+import {
+  UserContext,
+  tryRemoveEntryFromCart,
+  trySetEntryCountInCart,
+} from "@/app/components/user-provider";
+import { getShopItem, getLastPurchase } from "@/lib/persist-module";
 import {
   getImageOfCustomDuck,
   getImageOfItem,
 } from "@/app/components/item-images";
+import { TrashIcon, CreditCardIcon } from "@heroicons/react/24/solid";
 
 export default function Page() {
-  const [purchases, setPurchases] = useState<Purchase[]>([]);
+  const [customDuckPrice, setCustomDuckPrice] = useState<number>(0);
+  const [purchase, setPurchase] = useState<Purchase | null>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const loadPurchases = async function () {
-      setPurchases((await getPurchaseHistory()) ?? []);
+    const loadCustomDuckPrice = async function () {
+      setCustomDuckPrice((await getShopItem(0)).price);
+    };
+    const loadLastPurchase = async function () {
+      setPurchase(await getLastPurchase());
     };
 
     if (!mounted) {
-      loadPurchases();
+      loadCustomDuckPrice();
+      loadLastPurchase();
       setMounted(true);
     }
   });
 
   function getEntryElement(entry: PurchaseEntry, index: number) {
     let innerElement;
+    let unitPrice;
     if (entry.item.id == 0) {
       innerElement = getCustomDuckElement(entry.item as CustomDuck);
+      unitPrice = customDuckPrice;
     } else {
       innerElement = getItemElement(entry.item as ShopItem);
+      unitPrice = (entry.item as ShopItem).price;
     }
 
     return (
       <div key={index}>
         <div>Position: {index + 1}</div>
         <div>{innerElement}</div>
+        <p>Price: {unitPrice * entry.count}</p>
       </div>
     );
   }
@@ -59,13 +76,10 @@ export default function Page() {
 
   return (
     <div>
-      {purchases.map((purchase) => (
-        <div key={purchase.id}>
-          At: {new Date(purchase.date).toString()}
-          <br />
-          Items: {purchase.entries.map(getEntryElement)}
-        </div>
-      ))}
+      <p>Thank you for your purchase!</p>
+      <div>
+        {purchase?.entries.map((entry, index) => getEntryElement(entry, index))}
+      </div>
     </div>
   );
 }

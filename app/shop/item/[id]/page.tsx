@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { use, useEffect, useState, useContext, ChangeEvent } from "react";
 import { getShopItem } from "@/lib/persist-module";
 import {
@@ -20,6 +21,7 @@ export default function Page({ params }: { params: Promise<{ id: number }> }) {
   const [item, setItem] = useState<ShopItem | null | undefined>(undefined);
   const [count, setCount] = useState<number>(1);
   const [message, setMessage] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const getItem = async () => {
@@ -55,6 +57,11 @@ export default function Page({ params }: { params: Promise<{ id: number }> }) {
   }
 
   async function handleAddToCart() {
+    if (!user) {
+      router.push("/shop/user/login");
+      return;
+    }
+
     if (!item) return;
 
     if (await tryAddItemToCart(item, count)) {
