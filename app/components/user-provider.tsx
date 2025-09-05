@@ -1,6 +1,12 @@
 "use client";
 
-import { User, PurchaseEntry, ShopItem, CreditCardDetails } from "@/lib/types";
+import {
+  User,
+  PurchaseEntry,
+  ShopItem,
+  Address,
+  CreditCardDetails,
+} from "@/lib/types";
 import {
   createContext,
   useState,
@@ -128,7 +134,7 @@ export async function tryRemoveEntryFromCart(entryIndex: number) {
   return true;
 }
 
-export async function tryPay(address: PaymentAddress, card: CreditCardDetails) {
+export async function tryPay(address: Address, card: CreditCardDetails) {
   const succeeded = await tryServerPay(address, card);
 
   if (!succeeded) return false;
