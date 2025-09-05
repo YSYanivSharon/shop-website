@@ -101,22 +101,12 @@ export default function Page() {
   }
 
   async function onPay(_: FormData) {
-    if (!address) {
-      // TODO: Notify the user that the address is invalid
-      return;
-    }
-
-    if (!card) {
-      // TODO: Notify the user that the credit card is invalid
-      return;
-    }
-
     const successful = await tryPay(address, card);
 
     if (successful) {
       router.push("/shop/post-payment");
     } else {
-      alert("Payment failed. Please try again.");
+      alert("Payment failed. Check your information and try again.");
     }
   }
 
