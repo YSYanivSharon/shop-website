@@ -7,6 +7,7 @@ import { User, AuthLevel } from "@/lib/types";
 
 const userCookieName = "user";
 const certCookieName = "cert";
+const sessionExpirationCookieName = "expiration";
 
 export async function getSecret() {
   return "A completely random secret that is stored correctly";
@@ -57,18 +58,22 @@ export async function signup(email: string, password: string) {
     return "An error occurred while creating your account";
   }
 
-  await storeVerifiedSession(user);
+  await storeVerifiedSession(user, false);
 
   await addUserEvent(1, []);
 
   return user;
 }
 
-export async function login(email: string, password: string) {
+export async function login(
+  email: string,
+  password: string,
+  longTerm: boolean,
+) {
   const user = await getUserByEmail(email);
 
   if (user && user.password == (await getScrypt(password))) {
-    await storeVerifiedSession(user);
+    await storeVerifiedSession(user, longTerm);
     await addUserEvent(0, []);
     return user;
   }
@@ -83,8 +88,7 @@ export async function logout() {
   cookieStore.delete(certCookieName);
 }
 
-export async function storeVerifiedSession(user: User) {
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+async function storeVerifiedSessionCookies(user: User, expiresAt: number) {
   const cookieStore = await cookies();
   let userJson = JSON.stringify(user);
   cookieStore.set(userCookieName, userJson, {
@@ -101,6 +105,28 @@ export async function storeVerifiedSession(user: User) {
     sameSite: "lax",
     path: "/",
   });
+  cookieStore.set(sessionExpirationCookieName, expiresAt.toString(), {
+    httpOnly: true,
+    secure: true,
+    expires: expiresAt,
+    sameSite: "lax",
+    path: "/",
+  });
+}
+
+async function storeVerifiedSession(user: User, longTerm: boolean) {
+  const expiresAt =
+    Date.now() + (longTerm ? 12 * 24 * 60 * 60 * 1000 : 30 * 60 * 1000);
+  await storeVerifiedSessionCookies(user, expiresAt);
+}
+
+export async function updateVerifiedSession(user: User) {
+  const cookieStore = await cookies();
+
+  const expirationCookie = cookieStore.get(sessionExpirationCookieName);
+  if (!expirationCookie) return;
+
+  storeVerifiedSessionCookies(user, Number.parseInt(expirationCookie.value));
 }
 
 export async function getVerifiedSession() {

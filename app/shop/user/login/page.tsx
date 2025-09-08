@@ -8,13 +8,14 @@ import { useRouter } from "next/navigation";
 export default function Page() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [rememberMe, setRememberMe] = useState<boolean>(false);
   const [message, setMessage] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const user = await login(email, password);
+    const user = await login(email, password, rememberMe);
 
     if (user) {
       setMessage("Login successful!");
@@ -72,6 +73,17 @@ export default function Page() {
             >
               Login
             </button>
+            <div className="flex">
+              <input
+                type="checkbox"
+                name="rememberMe"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+              />
+              <label className="block text-sm font-medium mb-2 dark:text-gray-200">
+                Remember me
+              </label>
+            </div>
           </form>
 
           {message && (

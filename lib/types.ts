@@ -59,12 +59,20 @@ export type CustomDuckPartsCatalog = {
   bodies: ShopItem[];
 };
 
+export type Address = {
+  street: string;
+  city: string;
+  country: string;
+  postalCode: string;
+  recipient: string;
+};
+
 export type CreditCardDetails = {
   number: string;
   expirationYear: number;
   expirationMonth: number;
   name: string;
-  code: number;
+  code: string;
 };
 
 export type UserEvent = {
