@@ -30,13 +30,10 @@ export default function Page({ params }: { params: Promise<{ id: number }> }) {
       } catch (e) {
         console.error(e);
       }
+      setMounted(true);
     };
     getItem();
   }, [id]);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   function onCountChange(e: ChangeEvent<HTMLInputElement>) {
     let newCount = Number.parseInt(e.target.value) ?? 1;
@@ -68,16 +65,17 @@ export default function Page({ params }: { params: Promise<{ id: number }> }) {
       setMessage(`"${item.name}" has been added to your cart!`);
       setTimeout(() => setMessage(null), 2500);
     } else {
-      // TODO: Handle failure of adding to cart
+      setMessage(`Failed adding to cart`);
+      setTimeout(() => setMessage(null), 2500);
     }
   }
 
   return (
     <main className="max-w-5xl mx-auto p-6 relative">
-      {item === undefined && (
+      {!mounted && item === undefined && (
         <p className="text-center text-gray-600">Loading...</p>
       )}
-      {(item === null || (item && item?.type != ItemType.Duck)) && (
+      {((mounted && !item) || (item && item?.type != ItemType.Duck)) && (
         <p className="text-center text-red-500">Invalid item</p>
       )}
 
