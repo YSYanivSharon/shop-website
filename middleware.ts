@@ -21,6 +21,7 @@ const publicRoutes = [
   /^\/shop\/user\/login$/i,
   /^\/shop\/user\/signup$/i,
   /^\/llm$/i,
+  /^\/readme/i,
   /^\/favicon.ico$/i,
   /^\/images\/.*$/i,
 ];
