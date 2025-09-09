@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { UserEvent } from "@/lib/types";
 import { getUserById, getLatestUserEvents } from "@/lib/persist-module";
+import { Input } from "@headlessui/react";
 
 const eventTemplates = [
   "logged in",
@@ -30,6 +31,7 @@ export default function Page() {
     [key: number]: string;
   }>({});
   const [events, setEvents] = useState<UserEvent[]>([]);
+  const [filterQuery, setFilterQuery] = useState<string>("");
 
   useEffect(() => {
     updateEvents();
@@ -72,17 +74,33 @@ export default function Page() {
 
   return (
     <div>
-      {events.map((event) => {
-        return (
-          <div key={event.id}>
-            Date: {new Date(event.date).toLocaleString()}
-            <br />
-            User: {getEmail(event.userId)}
-            <br />
-            Message: {getEventMessage(event)}
-          </div>
-        );
-      })}
+      <div className="flex justify-end mb-5">
+        <p>Filter:</p>
+        <div className="size-2" />
+        <Input
+          className="bg-gray-200 dark:bg-gray-700 rounded-md"
+          value={filterQuery}
+          type="text"
+          onChange={(e) => {
+            setFilterQuery(e?.target.value);
+          }}
+        />
+      </div>
+      <div>
+        {events
+          .filter((event) => getEmail(event.userId).startsWith(filterQuery))
+          .map((event) => {
+            return (
+              <div key={event.id}>
+                Date: {new Date(event.date).toLocaleString()}
+                <br />
+                User: {getEmail(event.userId)}
+                <br />
+                Message: {getEventMessage(event)}
+              </div>
+            );
+          })}
+      </div>
     </div>
   );
 }
