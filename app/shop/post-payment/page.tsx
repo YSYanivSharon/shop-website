@@ -1,85 +1,145 @@
 "use client";
 
-import { useState, useEffect, useContext } from "react";
-import { Button, Input } from "@headlessui/react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Purchase, PurchaseEntry, ShopItem, CustomDuck } from "@/lib/types";
-import {
-  UserContext,
-  tryRemoveEntryFromCart,
-  trySetEntryCountInCart,
-} from "@/app/components/user-provider";
-import { getShopItem, getLastPurchase } from "@/lib/persist-module";
-import {
-  getImageOfCustomDuck,
-  getImageOfItem,
-} from "@/app/components/item-images";
-import { TrashIcon, CreditCardIcon } from "@heroicons/react/24/solid";
+import { getLastPurchase, getShopItem } from "@/lib/persist-module";
+import { getImageOfCustomDuck, getImageOfItem } from "@/app/components/item-images";
+import { CheckCircleIcon, ShoppingCartIcon, HomeIcon } from "@heroicons/react/24/solid";
 
-export default function Page() {
-  const [customDuckPrice, setCustomDuckPrice] = useState<number>(0);
+export default function PostPaymentPage() {
   const [purchase, setPurchase] = useState<Purchase | null>(null);
+  const [customDuckPrice, setCustomDuckPrice] = useState(0);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const loadCustomDuckPrice = async function () {
+    const load = async () => {
       setCustomDuckPrice((await getShopItem(0)).price);
-    };
-    const loadLastPurchase = async function () {
       setPurchase(await getLastPurchase());
     };
-
     if (!mounted) {
-      loadCustomDuckPrice();
-      loadLastPurchase();
+      load();
       setMounted(true);
     }
-  });
+  }, [mounted]);
 
-  function getEntryElement(entry: PurchaseEntry, index: number) {
-    let innerElement;
-    let unitPrice;
-    if (entry.item.id == 0) {
-      innerElement = getCustomDuckElement(entry.item as CustomDuck);
-      unitPrice = customDuckPrice;
-    } else {
-      innerElement = getItemElement(entry.item as ShopItem);
-      unitPrice = (entry.item as ShopItem).price;
-    }
+  const renderEntry = (entry: PurchaseEntry, i: number) => {
+    const isCustom = entry.item.id === 0;
+    const unitPrice = isCustom ? customDuckPrice : (entry.item as ShopItem).price;
+    const name = isCustom ? "Custom Duck" : (entry.item as ShopItem).name;
+    const image = isCustom
+      ? getImageOfCustomDuck(entry.item as CustomDuck)
+      : getImageOfItem(entry.item as ShopItem);
 
     return (
-      <div key={index}>
-        <div>Position: {index + 1}</div>
-        <div>{innerElement}</div>
-        <p>Price: {unitPrice * entry.count}</p>
+      <div
+        key={i}
+        className="flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6"
+      >
+        <div className="flex items-center gap-6">
+          <div className="w-20 h-20 flex items-center justify-center">{image}</div>
+          <div>
+            <p className="font-semibold text-lg text-slate-900 dark:text-slate-100">{name}</p>
+            <p className="text-base text-slate-600 dark:text-slate-300">₪{unitPrice} × {entry.count}</p>
+          </div>
+        </div>
+        <div className="font-semibold text-lg text-slate-900 dark:text-slate-100">
+          ₪{unitPrice * entry.count}
+        </div>
       </div>
     );
-  }
+  };
 
-  function getItemElement(item: ShopItem) {
+  if (!purchase) {
     return (
-      <>
-        {getImageOfItem(item)}
-        <p>{item.name}</p>
-      </>
+      <main className="max-w-3xl mx-auto p-10 text-center">
+        <CheckCircleIcon className="w-16 h-16 mx-auto text-green-500 mb-4" />
+        <h1 className="text-4xl font-bold mb-4">Thank you!</h1>
+        <p className="text-lg text-slate-600 dark:text-slate-300 mb-8">
+          We couldn’t find a recent order. Browse the catalog to start shopping.
+        </p>
+        <div className="flex justify-center gap-4">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-xl px-6 py-3 bg-gray-200 dark:bg-slate-700 text-lg text-slate-900 dark:text-slate-100 hover:bg-gray-300 dark:hover:bg-slate-600"
+          >
+            <HomeIcon className="w-6 h-6" />
+            Home
+          </Link>
+          <Link
+            href="/shop/catalog"
+            className="inline-flex items-center gap-2 rounded-xl px-6 py-3 bg-yellow-400 hover:bg-yellow-500 text-lg text-black"
+          >
+            <ShoppingCartIcon className="w-6 h-6" />
+            Continue Shopping
+          </Link>
+        </div>
+      </main>
     );
   }
 
-  function getCustomDuckElement(duck: CustomDuck) {
-    return (
-      <>
-        {getImageOfCustomDuck(duck)}
-        <p>Custom duck</p>
-      </>
-    );
-  }
+  const subtotal = purchase.entries.reduce((sum, e) => {
+    const unit = e.item.id === 0 ? customDuckPrice : (e.item as ShopItem).price;
+    return sum + unit * e.count;
+  }, 0);
+  const total = subtotal + purchase.shippingPrice;
 
   return (
-    <div>
-      <p>Thank you for your purchase!</p>
-      <div>
-        {purchase?.entries.map((entry, index) => getEntryElement(entry, index))}
+    <main className="max-w-5xl mx-auto p-10">
+      <div className="text-center mb-10">
+        <CheckCircleIcon className="w-16 h-16 mx-auto text-green-500 mb-4" />
+        <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100">Thank you for your purchase!</h1>
+        <p className="text-lg text-slate-600 dark:text-slate-300 mt-3">Your order is confirmed.</p>
       </div>
-    </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <section className="lg:col-span-2 space-y-4">
+          {purchase.entries.map(renderEntry)}
+        </section>
+
+        <aside className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 space-y-5">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Summary</h2>
+          <div className="flex justify-between text-lg text-slate-600 dark:text-slate-300">
+            <span>Items</span>
+            <span>₪{subtotal}</span>
+          </div>
+          <div className="flex justify-between text-lg text-slate-600 dark:text-slate-300">
+            <span>Shipping</span>
+            <span>₪{purchase.shippingPrice}</span>
+          </div>
+          <hr className="border-slate-200 dark:border-slate-700" />
+          <div className="flex justify-between text-2xl font-bold text-slate-900 dark:text-slate-100">
+            <span>Total</span>
+            <span>₪{total}</span>
+          </div>
+
+          <div className="mt-6">
+            <h3 className="text-base font-medium text-slate-600 dark:text-slate-300 mb-2">Shipping Address</h3>
+            <p className="text-base text-slate-700 dark:text-slate-200 leading-relaxed">
+              {purchase.address.recipient}<br />
+              {purchase.address.street}<br />
+              {purchase.address.city}, {purchase.address.country}
+            </p>
+          </div>
+        </aside>
+      </div>
+
+      <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 rounded-xl px-8 py-3 bg-gray-200 dark:bg-slate-700 text-lg text-slate-900 dark:text-slate-100 hover:bg-gray-300 dark:hover:bg-slate-600"
+        >
+          <HomeIcon className="w-6 h-6" />
+          Home
+        </Link>
+        <Link
+          href="/shop/catalog"
+          className="inline-flex items-center gap-2 rounded-xl px-8 py-3 bg-yellow-400 hover:bg-yellow-500 text-lg text-black"
+        >
+          <ShoppingCartIcon className="w-6 h-6" />
+          Continue Shopping
+        </Link>
+      </div>
+    </main>
   );
 }
