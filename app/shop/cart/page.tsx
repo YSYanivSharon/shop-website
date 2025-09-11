@@ -63,7 +63,9 @@ export default function CartPage() {
 
   function renderEntry(entry: PurchaseEntry, index: number) {
     const isCustom = entry.item.id === 0;
-    const unitPrice = isCustom ? customDuckPrice : (entry.item as ShopItem).price;
+    const unitPrice = isCustom
+      ? customDuckPrice
+      : (entry.item as ShopItem).price;
     const name = isCustom ? "Custom Duck" : (entry.item as ShopItem).name;
     const image = isCustom
       ? getImageOfCustomDuck(entry.item as CustomDuck)
@@ -75,10 +77,16 @@ export default function CartPage() {
         className="flex items-center justify-between bg-white dark:bg-slate-900 shadow-md hover:shadow-lg rounded-xl p-4 mb-3 border border-gray-100 dark:border-slate-700"
       >
         <div className="flex items-center gap-4">
-          <div className="w-20 h-20 flex items-center justify-center">{image}</div>
+          <div className="w-20 h-20 flex items-center justify-center">
+            {image}
+          </div>
           <div>
-            <p className="font-semibold text-lg text-slate-900 dark:text-slate-100">{name}</p>
-            <p className="text-slate-600 dark:text-slate-300">₪{unitPrice} each</p>
+            <p className="font-semibold text-lg text-slate-900 dark:text-slate-100">
+              {name}
+            </p>
+            <p className="text-slate-600 dark:text-slate-300">
+              ₪{unitPrice} each
+            </p>
             <p className="text-sm text-slate-500 dark:text-slate-400">
               Subtotal:{" "}
               <span className="font-semibold text-slate-900 dark:text-slate-100">
@@ -98,7 +106,7 @@ export default function CartPage() {
               <MinusIcon className="h-4 w-4 text-slate-600 dark:text-slate-300" />
             </button>
             <input
-              type="number"
+              type="text"
               min={1}
               max={99}
               value={entry.count}
@@ -132,7 +140,8 @@ export default function CartPage() {
   }
 
   const total = cart.reduce((sum, entry) => {
-    const price = entry.item.id === 0 ? customDuckPrice : (entry.item as ShopItem).price;
+    const price =
+      entry.item.id === 0 ? customDuckPrice : (entry.item as ShopItem).price;
     return sum + price * entry.count;
   }, 0);
 
@@ -141,7 +150,9 @@ export default function CartPage() {
   return (
     <main className="max-w-4xl mx-auto p-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Your Cart</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+          Your Cart
+        </h1>
         {cart.length > 0 && (
           <div className="text-sm text-slate-600 dark:text-slate-400">
             {totalItems} item{totalItems !== 1 ? "s" : ""} in cart
@@ -151,7 +162,9 @@ export default function CartPage() {
       {message && (
         <div
           className={`mb-4 p-3 rounded-lg text-center font-medium transition-all ${
-            message.includes("removed") || message.includes("must") || message.includes("Maximum")
+            message.includes("removed") ||
+            message.includes("must") ||
+            message.includes("Maximum")
               ? "bg-red-100 text-red-700 border border-red-300"
               : "bg-green-100 text-green-700 border border-green-300"
           }`}
@@ -182,7 +195,9 @@ export default function CartPage() {
               <span className="text-slate-600 dark:text-slate-300">
                 Items ({totalItems}):
               </span>
-              <span className="font-semibold text-slate-900 dark:text-slate-100">₪{total}</span>
+              <span className="font-semibold text-slate-900 dark:text-slate-100">
+                ₪{total}
+              </span>
             </div>
             <div className="flex justify-between items-center text-sm text-slate-500 dark:text-slate-400">
               <span>Shipping:</span>
@@ -191,7 +206,9 @@ export default function CartPage() {
             <hr className="border-slate-200 dark:border-slate-600" />
             <div className="flex justify-between items-center text-xl font-bold">
               <span className="text-slate-900 dark:text-slate-100">Total:</span>
-              <span className="text-slate-900 dark:text-slate-100">₪{total}</span>
+              <span className="text-slate-900 dark:text-slate-100">
+                ₪{total}
+              </span>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <Link
