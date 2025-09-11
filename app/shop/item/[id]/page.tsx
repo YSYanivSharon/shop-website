@@ -7,10 +7,10 @@ import {
   tryAddItemToCart,
   tryAddItemToWishlist,
   tryRemoveItemFromWishlist,
+  UserContext,
 } from "@/app/components/user-provider";
 import { ItemType, ShopItem, User } from "@/lib/types";
 import Image from "next/image";
-import { UserContext } from "@/app/components/user-provider";
 import { HeartIcon as SolidHeartIcon } from "@heroicons/react/24/solid";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";

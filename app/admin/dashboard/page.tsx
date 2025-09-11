@@ -14,6 +14,7 @@ const eventTemplates = [
   "removed {0} from their cart",
   "added {0} to their wishlist",
   "removed {0} from their wishlist",
+  "bought {0} items for ₪{1}",
 ];
 
 function formatString(template: string, details: string[]): string {
@@ -74,7 +75,7 @@ export default function Page() {
 
   return (
     <div>
-      <div className="flex justify-end mb-5">
+      <div className="flex justify-end mb-5 p-1">
         <p>Filter:</p>
         <div className="size-2" />
         <Input
@@ -86,21 +87,41 @@ export default function Page() {
           }}
         />
       </div>
-      <div>
-        {events
-          .filter((event) => getEmail(event.userId).startsWith(filterQuery))
-          .map((event) => {
-            return (
-              <div key={event.id}>
-                Date: {new Date(event.date).toLocaleString()}
-                <br />
-                User: {getEmail(event.userId)}
-                <br />
-                Message: {getEventMessage(event)}
-              </div>
-            );
-          })}
-      </div>
+      <table className="min-w-full border border-gray-300 dark:border-gray-600 rounded-md">
+        <thead className="bg-gray-100 dark:bg-gray-800">
+          <tr>
+            <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left w-auto whitespace-nowrap">
+              Date
+            </th>
+            <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left w-auto whitespace-nowrap">
+              User
+            </th>
+            <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left w-full">
+              Message
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {events
+            .filter((event) => getEmail(event.userId).startsWith(filterQuery))
+            .map((event) => (
+              <tr
+                key={event.id}
+                className="hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 w-auto whitespace-nowrap">
+                  {new Date(event.date).toLocaleString()}
+                </td>
+                <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 w-auto whitespace-nowrap">
+                  {getEmail(event.userId)}
+                </td>
+                <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 w-full">
+                  {getEventMessage(event)}
+                </td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
     </div>
   );
 }

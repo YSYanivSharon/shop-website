@@ -1,28 +1,43 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState, useContext } from "react";
 import { getImageOfCustomDuck } from "@/app/components/item-images";
 import { CustomDuck, CustomDuckPartsCatalog, User } from "@/lib/types";
-import { getDuckParts } from "@/lib/persist-module";
+import { getShopItem, getDuckParts } from "@/lib/persist-module";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { Button } from "@headlessui/react";
-import { tryAddCustomDuckToCart } from "@/app/components/user-provider";
+import {
+  tryAddCustomDuckToCart,
+  UserContext,
+} from "@/app/components/user-provider";
 
 export default function Page() {
   const [partsCatalog, setPartsCatalog] =
     useState<CustomDuckPartsCatalog | null>(null);
+  const [customDuckPrice, setCustomDuckPrice] = useState<number>(0);
+  const [mounted, setMounted] = useState(false);
   const [pickedColor, setPickedColor] = useState<number>(0);
   const [pickedHead, setPickedHead] = useState<number>(0);
   const [pickedBody, setPickedBody] = useState<number>(0);
   const [message, setMessage] = useState<string | null>(null);
+  const user = useContext(UserContext) as User;
+  const router = useRouter();
 
   useEffect(() => {
     const loadParts = async () => {
       setPartsCatalog(await getDuckParts());
     };
-    if (!partsCatalog) loadParts();
-  }, [partsCatalog]);
+    const loadCustomDuckPrice = async function () {
+      setCustomDuckPrice((await getShopItem(0)).price);
+    };
+    if (!mounted) {
+      loadParts();
+      loadCustomDuckPrice();
+      setMounted(true);
+    }
+  }, [mounted]);
 
   function getCustomDuck() {
     return {
@@ -49,6 +64,11 @@ export default function Page() {
   }
 
   async function handleAddToCart() {
+    if (!user) {
+      router.push("/shop/user/login");
+      return;
+    }
+
     if (!partsCatalog) return;
     if (
       await tryAddCustomDuckToCart(
@@ -60,7 +80,8 @@ export default function Page() {
       setMessage("Your custom duck was added to the cart!");
       setTimeout(() => setMessage(null), 3000);
     } else {
-      // TODO: Handle failure to add to the cart
+      setMessage("Failed to add the custom duck to the cart!");
+      setTimeout(() => setMessage(null), 3000);
     }
   }
 
@@ -167,9 +188,12 @@ export default function Page() {
               </div>
             </div>
 
-            <div className="flex gap-4 mt-6">
+            <div className="flex items-center gap-6 mt-6">
+              <div className="text-4xl text-yellow-600 font-bold ">
+                ₪{customDuckPrice}
+              </div>
               <Button
-                className="flex items-center gap-2 px-6 py-3 text-lg font-semibold rounded-lg bg-yellow-400 text-black hover:bg-yellow-500 shadow-lg"
+                className="flex items-center px-6 py-3 text-lg font-semibold rounded-lg bg-yellow-400 text-black hover:bg-yellow-500 shadow-lg"
                 onClick={handleAddToCart}
               >
                 <ShoppingCartIcon className="w-5 h-5" />
@@ -180,7 +204,13 @@ export default function Page() {
         )}
 
       {message && (
-        <div className="fixed bottom-6 right-6 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg animate-bounce">
+        <div
+          className={`fixed bottom-6 right-6 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg animate-bounce ${
+            message.includes("Failed")
+              ? "bg-red-100 text-red-700 border border-red-300"
+              : "bg-green-100 text-green-700 border border-green-300"
+          }`}
+        >
           {message}
         </div>
       )}

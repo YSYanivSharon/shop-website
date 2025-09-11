@@ -13,6 +13,7 @@ import {
   Address,
   CreditCardDetails,
   UserEvent,
+  CustomDuck,
 } from "@/lib/types";
 import { getVerifiedSession, updateVerifiedSession } from "@/lib/auth";
 
@@ -168,6 +169,15 @@ export async function tryAddCustomDuckToCart(
   return true;
 }
 
+function getItemDetails(item: ShopItem | CustomDuck) {
+  if (item.id == 0) {
+    const customDuck = item as CustomDuck;
+    return `custom duck with: { color: ${customDuck.color.name}, head: ${customDuck.head.name}, body: ${customDuck.body.name} }`;
+  } else {
+    const shopItem = item as ShopItem;
+    return shopItem.name;
+  }
+}
 export async function trySetEntryCountInCart(
   entryIndex: number,
   count: number,
@@ -178,7 +188,13 @@ export async function trySetEntryCountInCart(
 
   cart[entryIndex].count = count;
 
-  return await trySetCart(cart);
+  const success = await trySetCart(cart);
+
+  if (!success) return false;
+
+  addUserEvent(4, [getItemDetails(cart[entryIndex].item), count.toString()]);
+
+  return true;
 }
 
 export async function tryRemoveEntryFromCart(entryIndex: number) {
@@ -186,8 +202,19 @@ export async function tryRemoveEntryFromCart(entryIndex: number) {
 
   if (!cart) return false;
 
+  if (entryIndex >= cart.length) return false;
+
+  const removedItem = cart[entryIndex].item;
+
   cart = cart.filter((_, index) => index != entryIndex);
-  return await trySetCart(cart);
+
+  const success = await trySetCart(cart);
+
+  if (!success) return false;
+
+  addUserEvent(5, [getItemDetails(removedItem)]);
+
+  return true;
 }
 
 export async function tryClearCart() {
@@ -329,7 +356,7 @@ export async function tryPay(address: Address, card: CreditCardDetails) {
   for (var entry of user.cart) {
     var item = await getShopItem(entry.item.id);
     if (item) {
-      price += item.price;
+      price += item.price * entry.count;
       actualCart.push(entry);
     }
   }
@@ -361,6 +388,12 @@ export async function tryPay(address: Address, card: CreditCardDetails) {
 
   if (success) {
     await tryClearCart();
+    addUserEvent(8, [
+      actualCart
+        .reduce((sum, currEntry) => sum + currEntry.count, 0)
+        .toString(),
+      price.toString(),
+    ]);
   }
 
   return success;
