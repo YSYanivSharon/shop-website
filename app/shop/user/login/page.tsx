@@ -73,14 +73,18 @@ export default function Page() {
             >
               Login
             </button>
-            <div className="flex">
+            <div className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 name="rememberMe"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <label className="block text-sm font-medium mb-2 dark:text-gray-200">
+              <label
+                className="text-sm font-medium text-gray-700 dark:text-gray-200"
+                onClick={() => setRememberMe(!rememberMe)}
+              >
                 Remember me
               </label>
             </div>
