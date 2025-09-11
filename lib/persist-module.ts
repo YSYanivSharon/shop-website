@@ -425,7 +425,7 @@ export async function getPurchaseHistory() {
   if (!user) return null;
 
   const getPurchasesOfUser = db.prepare(
-    "SELECT * FROM Purchases WHERE userId = ?",
+    "SELECT * FROM Purchases WHERE userId = ? ORDER BY date DESC",
   );
 
   const dbPurchaseHistory = getPurchasesOfUser.all(user.id) as DBPurchase[];

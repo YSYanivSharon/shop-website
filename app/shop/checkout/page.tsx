@@ -122,7 +122,7 @@ export default function CheckoutPage() {
       return;
     }
 
-    const successful = await tryPay(address as Address, card);
+    const successful = await tryPay(address, card);
     if (successful) {
       router.push("/shop/post-payment");
     } else {
@@ -338,4 +338,3 @@ export default function CheckoutPage() {
     </form>
   );
 }
-
