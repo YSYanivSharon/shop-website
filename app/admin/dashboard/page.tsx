@@ -14,6 +14,7 @@ const eventTemplates = [
   "removed {0} from their cart",
   "added {0} to their wishlist",
   "removed {0} from their wishlist",
+  "Bought {0} items for ₪{1}",
 ];
 
 function formatString(template: string, details: string[]): string {

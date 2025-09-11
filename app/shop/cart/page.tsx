@@ -179,7 +179,7 @@ export default function CartPage() {
             Your cart is empty
           </p>
           <Link
-            href="/shop"
+            href="/shop/catalog"
             className="inline-flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-black font-semibold px-6 py-3 rounded-xl shadow-md transition-colors"
           >
             Continue Shopping
@@ -212,7 +212,7 @@ export default function CartPage() {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <Link
-                href="/shop"
+                href="/shop/catalog"
                 className="flex-1 text-center bg-gray-200 dark:bg-slate-700 hover:bg-gray-300 dark:hover:bg-slate-600 text-slate-900 dark:text-slate-100 font-semibold px-6 py-3 rounded-xl transition-colors"
               >
                 Continue Shopping
