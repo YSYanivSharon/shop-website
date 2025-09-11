@@ -38,7 +38,7 @@ export type Purchase = {
   date: number;
   entries: PurchaseEntry[];
   shippingPrice: number;
-  address: PaymentAddress;
+  address: Address;
 };
 
 export type PurchaseEntry = {
