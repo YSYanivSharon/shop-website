@@ -18,20 +18,7 @@ export default function Page() {
         </p>
       </header>
 
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div className="group rounded-3xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm p-8 min-h-[240px] flex flex-col hover:scale-105 transition-transform duration-300">
-          <div className="mb-4 flex items-center gap-3">
-            <ChatBubbleLeftIcon className="w-8 h-8 text-yellow-500" />
-            <h2 className="text-xl font-semibold">Live chat (להשלים)</h2>
-          </div>
-          <p className="text-gray-600 dark:text-gray-300 mb-6 leading-7">
-            Talk to an agent in real time.
-          </p>
-          <button className="mt-auto inline-flex justify-center rounded-full px-5 py-2 font-semibold bg-yellow-400 hover:bg-yellow-500 text-white transition">
-            Start Chat
-          </button>
-        </div>
-
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="group rounded-3xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm p-8 min-h-[240px] flex flex-col hover:scale-105 transition-transform duration-300">
           <div className="mb-4 flex items-center gap-3">
             <EnvelopeIcon className="w-8 h-8 text-yellow-500" />
