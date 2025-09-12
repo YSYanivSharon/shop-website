@@ -7,24 +7,30 @@ const BASE_URL = "http://localhost:3000";
  * This means that you can't really test the page using a simple fetch and instead you need to call the server function.
  */
 
+async function runTest(description: string, func: () => Promise<boolean>) {
+  var passed = false;
+  try {
+    passed = await func();
+  } catch (err) {}
+
+  console.log(`${description}: ${passed ? "passed" : "failed"}`);
+}
+
 async function testExistingItemPage() {
   const ITEM_ID = 1;
   try {
     const res = await fetch(`${BASE_URL}/shop/item/${ITEM_ID}`);
     if (!res.ok) {
-      throw new Error(`Request failed: ${res.status} ${res.statusText}`);
+      return false;
     }
 
     const contentType = res.headers.get("content-type");
     if (contentType?.includes("text/html")) {
       const html = await res.text();
-      console.log(`Got text/HTML: ${html}`);
-    } else {
-      console.log(`Got unexpected content type: ${contentType}`);
+      return html.length > 0;
     }
-  } catch (err) {
-    console.error(`Fetch failed: ${err}`);
-  }
+  } catch (err) {}
+  return false;
 }
 
 // This still loads the page, but the page will display that the item is invalid after fetching it fails
@@ -33,20 +39,17 @@ async function testInvalidItemPage() {
   try {
     const res = await fetch(`${BASE_URL}/shop/item/${ITEM_ID}`);
     if (!res.ok) {
-      throw new Error(`Request failed: ${res.status} ${res.statusText}`);
+      return false;
     }
 
     const contentType = res.headers.get("content-type");
     if (contentType?.includes("text/html")) {
       const html = await res.text();
-      console.log(`Got text/HTML: ${html}`);
-    } else {
-      console.log(`Got unexpected content type: ${contentType}`);
+      return html.length > 0;
     }
-  } catch (err) {
-    console.error(`Fetch failed: ${err}`);
-  }
+  } catch (err) {}
+  return false;
 }
 
-testExistingItemPage();
-testInvalidItemPage();
+runTest("Testing the fetching of an existing shop item", testExistingItemPage);
+runTest("Testing the fetching of an invalid shop item", testInvalidItemPage);
