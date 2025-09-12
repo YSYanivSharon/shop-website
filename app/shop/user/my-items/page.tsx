@@ -1,6 +1,6 @@
 "use client";
 
-import { getPurchaseHistory } from "@/lib/persist-module";
+import { getShopItem, getPurchaseHistory } from "@/lib/persist-module";
 import { Purchase, PurchaseEntry, ShopItem, CustomDuck } from "@/lib/types";
 import { useState, useEffect } from "react";
 import {
@@ -10,14 +10,20 @@ import {
 
 export default function Page() {
   const [purchases, setPurchases] = useState<Purchase[]>([]);
+  const [customDuckPrice, setCustomDuckPrice] = useState<number>(0);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const loadPurchases = async () => {
       setPurchases((await getPurchaseHistory()) ?? []);
     };
+    const loadCustomDuckPrice = async () => {
+      setCustomDuckPrice((await getShopItem(0)).price);
+    };
+
     if (!mounted) {
       loadPurchases();
+      loadCustomDuckPrice();
       setMounted(true);
     }
   }, [mounted]);
@@ -25,9 +31,7 @@ export default function Page() {
   const renderEntry = (entry: PurchaseEntry, index: number) => {
     const isCustom = entry.item.id === 0;
     const name = isCustom ? "Custom Duck" : (entry.item as ShopItem).name;
-    const price = isCustom
-      ? (entry.item as CustomDuck).price
-      : (entry.item as ShopItem).price;
+    const price = isCustom ? customDuckPrice : (entry.item as ShopItem).price;
     const image = isCustom
       ? getImageOfCustomDuck(entry.item as CustomDuck)
       : getImageOfItem(entry.item as ShopItem);
@@ -73,9 +77,7 @@ export default function Page() {
         {purchases.map((purchase) => {
           const subtotal = purchase.entries.reduce((sum, e) => {
             const unit =
-              e.item.id === 0
-                ? (e.item as CustomDuck).price
-                : (e.item as ShopItem).price;
+              e.item.id === 0 ? customDuckPrice : (e.item as ShopItem).price;
             return sum + unit * e.count;
           }, 0);
           const total = subtotal + purchase.shippingPrice;
@@ -105,3 +107,4 @@ export default function Page() {
     </main>
   );
 }
+
