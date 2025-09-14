@@ -1,33 +1,29 @@
 "use client";
 
-import { getPurchaseHistory } from "@/lib/persist-module";
+import { useEffect, useState } from "react";
 import { Purchase, PurchaseEntry, ShopItem, CustomDuck } from "@/lib/types";
-import { useState, useEffect } from "react";
+import { getPurchaseHistory, getShopItem } from "@/lib/persist-module";
 import {
   getImageOfCustomDuck,
   getImageOfItem,
 } from "@/app/components/item-images";
 
-export default function Page() {
+export default function MyItemsPage() {
   const [purchases, setPurchases] = useState<Purchase[]>([]);
-  const [mounted, setMounted] = useState(false);
+  const [customDuckPrice, setCustomDuckPrice] = useState<number>(0);
 
   useEffect(() => {
     const loadPurchases = async () => {
       setPurchases((await getPurchaseHistory()) ?? []);
+      setCustomDuckPrice((await getShopItem(0)).price);
     };
-    if (!mounted) {
-      loadPurchases();
-      setMounted(true);
-    }
-  }, [mounted]);
+    loadPurchases();
+  }, []);
 
-  const renderEntry = (entry: PurchaseEntry, index: number) => {
+  function getEntryElement(entry: PurchaseEntry, index: number) {
     const isCustom = entry.item.id === 0;
+    const price = isCustom ? customDuckPrice : (entry.item as ShopItem).price;
     const name = isCustom ? "Custom Duck" : (entry.item as ShopItem).name;
-    const price = isCustom
-      ? (entry.item as CustomDuck).price
-      : (entry.item as ShopItem).price;
     const image = isCustom
       ? getImageOfCustomDuck(entry.item as CustomDuck)
       : getImageOfItem(entry.item as ShopItem);
@@ -35,73 +31,59 @@ export default function Page() {
     return (
       <div
         key={index}
-        className="flex items-center justify-between rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 mb-3 shadow-sm"
+        className="flex items-center justify-between bg-slate-800 text-slate-100 shadow rounded-lg p-4"
       >
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 flex items-center justify-center">
             {image}
           </div>
           <div>
-            <p className="font-semibold text-slate-900 dark:text-slate-100">
-              {name}
-            </p>
-            <p className="text-slate-600 dark:text-slate-300">
+            <p className="font-semibold">{name}</p>
+            <p className="text-sm text-slate-400">
               ₪{price} × {entry.count}
             </p>
           </div>
         </div>
-        <p className="font-bold text-slate-900 dark:text-slate-100">
-          ₪{price * entry.count}
-        </p>
+        <p className="font-bold">₪{price * entry.count}</p>
       </div>
     );
-  };
+  }
 
   return (
-    <main className="max-w-3xl mx-auto p-6">
-      <h1 className="text-3xl font-bold text-center mb-6 text-slate-900 dark:text-slate-100">
+    <div className="max-w-3xl mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-6 text-center text-slate-900 dark:text-slate-100">
         My Items
       </h1>
-
-      {purchases.length === 0 && (
-        <p className="text-center text-slate-600 dark:text-slate-300">
-          You have no past orders yet.
-        </p>
-      )}
-
       <div className="space-y-6">
         {purchases.map((purchase) => {
-          const subtotal = purchase.entries.reduce((sum, e) => {
-            const unit =
-              e.item.id === 0
-                ? (e.item as CustomDuck).price
-                : (e.item as ShopItem).price;
-            return sum + unit * e.count;
+          const total = purchase.entries.reduce((sum, e) => {
+            const price =
+              e.item.id === 0 ? customDuckPrice : (e.item as ShopItem).price;
+            return sum + price * e.count;
           }, 0);
-          const total = subtotal + purchase.shippingPrice;
 
           return (
             <div
               key={purchase.id}
-              className="rounded-xl border border-slate-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 shadow p-5"
+              className="bg-slate-900 text-slate-100 rounded-lg shadow-lg p-4 space-y-4"
             >
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+              <div className="flex justify-between items-center border-b border-slate-700 pb-2">
+                <p className="font-semibold">
                   Order on {new Date(purchase.date).toLocaleDateString()}
-                </h2>
-                <span className="text-slate-700 dark:text-slate-200 font-medium">
-                  Total: ₪{total}
-                </span>
+                </p>
+                <p className="font-bold">Total: ₪{total}</p>
               </div>
-              <div>{purchase.entries.map(renderEntry)}</div>
-              <div className="text-sm text-slate-600 dark:text-slate-300 mt-3">
+              <div className="space-y-3">
+                {purchase.entries.map((entry, i) => getEntryElement(entry, i))}
+              </div>
+              <div className="text-sm text-slate-400 pt-2">
                 Shipping to: {purchase.address.recipient},{" "}
-                {purchase.address.city}, {purchase.address.country}
+                {purchase.address.street}, {purchase.address.city}
               </div>
             </div>
           );
         })}
       </div>
-    </main>
+    </div>
   );
 }
